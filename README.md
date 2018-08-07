@@ -7,35 +7,35 @@ React开发的手机端商城，使用antd-mobile UI框架
 
 #### 项目预览
 
-<img src="./doc/1.png" width="160">
-<img src="./doc/2.png" width="160">
-<img src="./doc/3.png" width="160">
-<img src="./doc/4.png" width="160">
-<img src="./doc/5.png" width="160">
-<img src="./doc/6.png" width="160">
-<img src="./doc/7.png" width="160">
-<img src="./doc/8.png" width="160">
-<img src="./doc/9.png" width="160">
-<img src="./doc/10.png" width="160">
-<img src="./doc/11.png" width="160">
-<img src="./doc/12.png" width="160">
-<img src="./doc/13.png" width="160">
-<img src="./doc/14.png" width="160">
-<img src="./doc/15.png" width="160">
-<img src="./doc/16.png" width="160">
-<img src="./doc/17.png" width="160">
-<img src="./doc/18.png" width="160">
-<img src="./doc/19.png" width="160">
-<img src="./doc/20.png" width="160">
-<img src="./doc/21.png" width="160">
-<img src="./doc/22.png" width="160">
-<img src="./doc/23.png" width="160">
-<img src="./doc/24.png" width="160">
-<img src="./doc/25.png" width="160">
-<img src="./doc/26.png" width="160">
-<img src="./doc/27.png" width="160">
-<img src="./doc/28.png" width="160">
-<img src="./doc/29.png" width="160">
+<img src="./doc/1.png" width="220">
+<img src="./doc/2.png" width="220">
+<img src="./doc/3.png" width="220">
+<img src="./doc/4.png" width="220">
+<img src="./doc/5.png" width="220">
+<img src="./doc/6.png" width="220">
+<img src="./doc/7.png" width="220">
+<img src="./doc/8.png" width="220">
+<img src="./doc/9.png" width="220">
+<img src="./doc/10.png" width="220">
+<img src="./doc/11.png" width="220">
+<img src="./doc/12.png" width="220">
+<img src="./doc/13.png" width="220">
+<img src="./doc/14.png" width="220">
+<img src="./doc/15.png" width="220">
+<img src="./doc/16.png" width="220">
+<img src="./doc/17.png" width="220">
+<img src="./doc/18.png" width="220">
+<img src="./doc/19.png" width="220">
+<img src="./doc/20.png" width="220">
+<img src="./doc/21.png" width="220">
+<img src="./doc/22.png" width="220">
+<img src="./doc/23.png" width="220">
+<img src="./doc/24.png" width="220">
+<img src="./doc/25.png" width="220">
+<img src="./doc/26.png" width="220">
+<img src="./doc/27.png" width="220">
+<img src="./doc/28.png" width="220">
+<img src="./doc/29.png" width="220">
 
 
 #### 软件架构
