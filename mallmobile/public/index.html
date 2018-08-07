@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>mall</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+    <script src="https://lib.baomitu.com/react/16.4.1/umd/react.development.js"></script>
+    <script src="https://lib.baomitu.com/react/16.4.1/umd/react.development.js"></script>
+    <script src="https://lib.baomitu.com/react-dom/16.4.1/umd/react-dom.development.js"></script>
+    <script src="https://lib.baomitu.com/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://as.alipayobjects.com/g/component/fastclick/1.0.6/fastclick.js"></script>
+    <script>
+      if ('addEventListener' in document) {
+        document.addEventListener('DOMContentLoaded', function() {
+          FastClick.attach(document.body);
+        }, false);
+      }
+      if(!window.Promise) {
+        document.writeln('<script src="https://as.alipayobjects.com/g/component/es6-promise/3.2.2/es6-promise.min.js"'+'>'+'<'+'/'+'script>');
+      }
+    </script>
+    <style>
+      html,body,#root{
+        height:100%;
+        border: 0;
+        margin:0;
+        padding:0;
+      }
+      body{
+        min-width: 320px;
+        max-width: 540px;
+        margin:0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      You need to enable JavaScript to run this app.
+    </noscript>
+    <div id="root"></div>
+  </body>
+</html>
