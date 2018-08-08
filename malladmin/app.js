@@ -26,6 +26,7 @@ app.use(Session({
 },app))
 //配置静态资源
 app.use(Static(path.join(__dirname,'static')))
+app.use(Static(path.join(__dirname,'dist')))
 //配置post请求数据接收
 app.use(BodyParser());
 //jsonp
