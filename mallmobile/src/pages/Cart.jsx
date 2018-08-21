@@ -9,6 +9,8 @@ import Loading from '@base/Loading'
 import '@common/styles/cart.scss'
 //ajax
 import axios from 'axios'
+import $ from 'jquery'
+import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
 import classnames from 'classnames'
 
 
@@ -26,16 +28,30 @@ class Cart extends Component {
     }
     //获取购物车列表
     getCartList(){
-        (async ()=>{
-            let {data} = await axios.get('/api/alliance/cartList').then(res=>res);
-            this.setState({
-                data:data.data,
-                loading:false,
-                checkedNum:0,
-                allPrice:0,
-                cartNmu:0,
-            })
-        })()
+        let that = this
+        $.ajax({
+            type:'get',
+            data:{
+                token:getToken()
+            },
+            url:baseUrl+'/cart/getCart',
+            success(res){
+                console.log(res)
+                that.setState({
+                    data:res.data.data.map(v=>{
+                        return {
+                            ...v,
+                            check:false,
+                            value:v.quantity
+                        }
+                    }),
+                    loading:false,
+                    checkedNum:0,
+                    allPrice:0,
+                    cartNmu:0,
+                })
+            }
+        })
     }
     //全选
     allChange(e){
@@ -94,7 +110,7 @@ class Cart extends Component {
             if(item.check){
                 cartNmu+=1;
                 checkedNum+=parseFloat(item.value);
-                allPrice+=parseFloat(item.value)*parseFloat(item.price)
+                allPrice+=parseFloat(item.value)*parseFloat(item.productSalesPrice)
             }
         })
         this.setState({
@@ -106,8 +122,31 @@ class Cart extends Component {
     //购买
     buy(){
         console.log(this.state)
+        var allData = {};
+        allData['items']=[]
+        this.state.data.forEach(v=>{
+            if(v.check){
+                allData['items'].push({
+                    productId: v.productId,
+                    selectQuantity: v.value,
+                    skuId: v.skuId,
+                    skuStr: v.skuStr,
+                    productName: v.productName,
+                    productPrice: v.productSalesPrice,
+                    productImage: imgUrl+v.productThumbnail,
+                    pickupWay: v.pickupWay
+                })
+            }
+        })
+        
+        allData['pickupWay'] = allData['items'][0].pickupWay;
+        console.log(allData)
+        //保存数据到本地
+        sessionStorage.setItem('goodDetailData', JSON.stringify(allData));
+        sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+        this.props.history.push('/order')
     }
-    delete(){
+    deleteAll(){
         let deleteData = this.state.data.filter(v=>{
             if(v.check){
                 return v
@@ -115,7 +154,6 @@ class Cart extends Component {
         })
         console.log(deleteData)
     }
-    //删除购物车
     //装载组件
     componentDidMount(){
         this.getCartList()
@@ -123,8 +161,8 @@ class Cart extends Component {
     render() {
         return (
             <div className="cart-page" style={{overflow:'hidden'}}>
-                <TextHeader returnbtn={false} title="购物车" pathname="/">
-                    <span className="edit" onClick={(e)=>{
+                <TextHeader returnbtn={true} title="购物车" pathname={sessionStorage.getItem('__search_prev_path__')}>
+                    {/* <span className="edit" onClick={(e)=>{
                         e.preventDefault();
                         this.setState({deleteAll:!this.state.deleteAll})
                     }}>
@@ -134,14 +172,14 @@ class Cart extends Component {
                         :
                         '编辑'
                     }
-                    </span>
+                    </span> */}
                 </TextHeader>
                 <div className="cart-body">
                     {
                         this.state.loading?
                         <Loading/>
                         :
-                        <CartList changeStock={this.changeStock.bind(this)} checkChange={this.checkChange.bind(this)} data={this.state.data}></CartList>
+                        <CartList getCartList={this.getCartList.bind(this)} changeStock={this.changeStock.bind(this)} checkChange={this.checkChange.bind(this)} data={this.state.data}></CartList>
                     }
                 </div>
                 {

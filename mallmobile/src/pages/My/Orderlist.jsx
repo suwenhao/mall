@@ -1,25 +1,33 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import { Tabs, SearchBar, SwipeAction, PullToRefresh } from 'antd-mobile'
+import { Tabs, SearchBar, SwipeAction, PullToRefresh, Toast, Modal } from 'antd-mobile'
 import Header from '@components/Header/Header'
 import Loading from '@base/Loading'
 import axios from 'axios'
+import $ from 'jquery'
+import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
 
 import '@common/styles/orderlist.scss'
 
 class Orderlist extends Component {
   constructor(props){
     super(props)
+    let tabs = [
+      { title: '全部', sub: 0 },
+      { title: '待付款', sub: 1 },
+      { title: '待发货', sub: 2 },
+      { title: '待收货', sub: 3 },
+      // { title: '已取消', sub: 4 },
+      { title: '待评价', sub: 6 },
+      { title: '已完成', sub: 7 },
+    ]
     var orderIndex=sessionStorage.getItem('__session_order__');
+    let currentIndex=tabs.findIndex((v)=>{
+      return v.sub==orderIndex
+    })
     this.state={
-      orderIndex:orderIndex !==null ? parseInt(orderIndex,10) : 1,
-      tabs:[
-        { title: '全部', sub: 0 },
-        { title: '待付款', sub: 1 },
-        { title: '待发货', sub: 2 },
-        { title: '待评价', sub: 3 },
-        { title: '退货售后', sub: 4 },
-      ],
+      orderIndex:currentIndex,
+      tabs:tabs,
       val:'',
       down:false,
       height: document.documentElement.clientHeight-134,
@@ -33,40 +41,240 @@ class Orderlist extends Component {
       refreshing:true
     }
   }
+  //获取订单列表
   getOrderList(cb){
     (async ()=>{
       let params = {
+        token:getToken(),
         pageNumber:this.state.pageNumber,
         pageSize:this.state.pageSize,
         status:this.state.status
       }
-      let {data} = await axios.post('/api/alliance/order/list',params).then(res=>res)
+      let {data} = await axios.get(baseUrl+'/order/list',{params}).then(res=>res)
+      console.log(data)
       this.setState({
-        list:data.data,
+        list:data.data.data,
         loading:false,
-        orderTip:data.data.length>0?false:true
+        pageNumber:this.state.pageNumber+1,
+        pageSize:10,
+        orderTip:data.data.data.length>0?false:true,
+        totalPages:data.data.totalPages
       },()=>{
         cb&&cb()
       })
     })()
   }
-  changeStatus(index){
+  //切换tab
+  changeStatus(tab,index){
     this.setState({
       orderIndex:index,
-      status:index,
+      status:tab.sub,
       loading:true,
       orderTip:false,
       list:[],
       pageNumber:1,
-      pageSize:1,
+      pageSize:10,
       refreshing:false
     },()=>{
       this.getOrderList()
     })
   }
-  onRefresh(){
-    
+  //取消订单
+  cancelOrder(item){
+      var that=this;
+      Modal.alert('提示', '是否取消该订单？', [
+        { text: '取消', onPress: () => console.log('cancel'), style: 'default' },
+        { text: '确认', onPress: () => {
+          $.ajax({
+            type:'post',
+            data:{
+                token:getToken(),
+                orderId:item.orderId,
+                cancelReason:7
+            },
+            url:baseUrl+'/order/cancelOrder',
+            success(res){
+              Toast.info("取消订单成功",1);
+              that.setState({
+                list:[],
+                loading:true,
+                pageNumber:1,
+                pageSize:10,
+                totalPages:1,
+                refreshing: false
+              },()=>{
+                that.getOrderList()
+              })
+            }
+          })
+        } },
+      ])
   }
+  //删除订单
+  removeOrder(item){
+    console.log(item)
+    var that=this;
+    Modal.alert('提示', '是否删除该订单？', [
+      { text: '取消', onPress: () => console.log('cancel'), style: 'default' },
+      { text: '确认', onPress: () => {
+        $.ajax({
+          type:'post',
+          data:{
+              token:getToken(),
+              orderId:parseInt(item.orderId),
+              cancelReason:7
+          },
+          url:baseUrl+'/order/delete',
+          success(res){
+            Toast.info("删除订单成功",1);
+            that.setState({
+              list:[],
+              loading:true,
+              pageNumber:1,
+              pageSize:10,
+              totalPages:1,
+              refreshing: false
+            },()=>{
+              that.getOrderList()
+            })
+          }
+        })
+      } },
+    ])
+  }
+  //加载更多
+  getRefresh(cb){
+    if(this.state.pageNumber>this.state.totalPages){
+      this.setState({ refreshing: false });
+      return;
+    }else{
+      (async ()=>{
+        let params = {
+          token:getToken(),
+          pageNumber:this.state.pageNumber,
+          pageSize:this.state.pageSize,
+          status:this.state.status
+        }
+        let {data} = await axios.get(baseUrl+'/order/list',{params}).then(res=>res)
+        console.log(data)
+        let newData=this.state.list.concat(data.data.data)
+        this.setState({
+          list:newData,
+          loading:false,
+          pageNumber:this.state.pageNumber+1,
+          pageSize:10,
+          orderTip:newData.length>0?false:true,
+          totalPages:data.data.totalPages,
+          refreshing: false 
+        },()=>{
+          cb&&cb()
+        })
+      })()
+    }
+  }
+  //支付
+  payment(item){
+    let that = this;
+    let reqType = 1;  //请求类型 1-订单 2-卡券 3-团购 4-充值 5-其他
+    let params = {
+        token: getToken(),
+        totalFee: item.orderMoney,
+        outTradeNo: item.orderId,
+        reqType: reqType,
+        body:''
+    };
+    $.ajax({
+        type:'post',
+        data:params,
+        url:baseUrl+'/getWxPrepayId',
+        dataType:'json',
+        success(res){
+            if(res.code == 0){
+                var data=res.data
+                try {
+                    if(window.WeixinJSBridge){
+                        window.WeixinJSBridge.invoke(
+                            'getBrandWCPayRequest', {
+                                "appId":data.appId,     //公众号名称，由商户传入     
+                                "timeStamp":data.timeStamp,         //时间戳，自1970年以来的秒数     
+                                "nonceStr":data.nonceStr, //随机串     
+                                "package":data.package,     
+                                "signType":data.signType,         //微信签名方式：     
+                                "paySign":data.paySign //微信签名 
+                            },
+                            function(res){     
+                                if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                                    Toast.info("支付成功",1);
+                                    that.props.history.push('/my/orderlist')
+                                }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+                            }
+                        );
+                    }
+                } catch (error) {
+                    
+                }
+            }
+        }
+    })
+  }
+  //删除按钮
+  deleteBtns(item){
+    if(item.orderStatus===4||item.orderStatus===3){
+      return [{
+        text: '删除',
+        onPress: () =>{
+          this.removeOrder(item)
+          return false;
+        },
+        style: { backgroundColor: '#F4333C', color: 'white' },
+      }]
+    }else if(item.orderStatus===1){
+      return [{
+        text: '取消',
+        onPress: () =>{
+          this.cancelOrder(item)
+          return false;
+        },
+        style: { backgroundColor: '#FFAC1D', color: 'white' },
+      }]
+    }
+  }
+  // 确认收货
+  completeOrder (item) {
+    let that=this;
+    Modal.alert('提示', '请确认您已经收到货物', [
+      { text: '取消', onPress: () => console.log('cancel'), style: 'default' },
+      { text: '确认', onPress: () => {
+        $.ajax({
+          type:'post',
+          data:{
+              token:getToken(),
+              orderId:parseInt(item.orderId)
+          },
+          url:baseUrl+'/order/completeOrder',
+          success(res){
+            Toast.info("收货成功",1);
+            that.setState({
+              list:[],
+              loading:true,
+              pageNumber:1,
+              pageSize:10,
+              totalPages:1,
+              refreshing: false
+            },()=>{
+              that.getOrderList()
+            })
+          }
+        })
+      } },
+    ])
+  }
+  //立即评论
+  gotoComment(item) {
+    var that = this;
+    that.props.history.push('/my/orderComment/'+item.id)
+  }
+  //挂载组件
   componentDidMount(){
     this.getOrderList()
   }
@@ -113,7 +321,7 @@ class Orderlist extends Component {
               renderTab={tab => <span>{tab.title}</span>}
               onChange={(tab, index) => {
                 sessionStorage.setItem('__session_order__',index)
-                this.changeStatus(index)
+                this.changeStatus(tab,index)
               }}
             >
               <PullToRefresh
@@ -127,10 +335,9 @@ class Orderlist extends Component {
                 direction={this.state.down ? 'down' : 'up'}
                 refreshing={this.state.refreshing}
                 onRefresh={() => {
-                  this.setState({ refreshing: true });
-                  setTimeout(() => {
-                    this.setState({ refreshing: false });
-                  }, 1000);
+                  this.setState({ refreshing: true },()=>{
+                    this.getRefresh()
+                  });
                 }}
               >
                 {
@@ -148,16 +355,7 @@ class Orderlist extends Component {
                         <SwipeAction
                           key={i}
                           style={{ backgroundColor: '#f5f5f9',paddingBottom:'10px' }}
-                          right={[
-                            {
-                              text: '删除',
-                              onPress: () =>{
-                                console.log('delete')
-                                return false;
-                              },
-                              style: { backgroundColor: '#F4333C', color: 'white' },
-                            },
-                          ]}
+                          right={this.deleteBtns(item)}
                           onOpen={() => console.log('global open')}
                           onClose={() => {
                             console.log('global close')
@@ -167,7 +365,7 @@ class Orderlist extends Component {
                         <div className="order-item">
                           <div className="order-id">
                             <span className="label">订单号：</span>
-                            {item.orderId}
+                            {item.orderId} 
                           </div>
                           <div className="order-state">
                             <div className="o-left">
@@ -181,7 +379,36 @@ class Orderlist extends Component {
                               </div>
                             </div>
                             <div className="o-right">
-                              <button>支付</button>
+                              {
+                                item.orderStatus===1||item.orderStatus===0?
+                                  <button onClick={()=>{
+                                    this.payment(item)
+                                  }}>支付</button>
+                                :
+                                null
+                              }
+                              {
+                                item.orderStatus===2?
+                                  null
+                                :
+                                null
+                              }
+                              {
+                                item.orderStatus===3?
+                                  <button onClick={()=>{
+                                    this.completeOrder(item)
+                                  }}>确认收货</button>
+                                :
+                                null
+                              }
+                              {
+                                item.orderStatus===6?
+                                  <button onClick={()=>{
+                                    this.gotoComment(item)
+                                  }}>评价</button>
+                                :
+                                null
+                              }
                             </div>
                           </div>
                           <div className="order-list" onClick={()=>{
@@ -193,11 +420,11 @@ class Orderlist extends Component {
                                 item.orderItems.map((jtem,j)=>{
                                   return (
                                     <div key={j} className="order-goods">
-                                      <img src={require(`@common/images/test/1.jpg`)} alt=""/>
+                                      <img src={imgUrl+jtem.thumbnail} alt=""/>
                                       <div className="right">
                                         <div className="title">{jtem.name}</div>
                                         <div className="piece">
-                                          <span>￥{jtem.price}</span>
+                                          <span>￥{jtem.price.toFixed(2)}</span>
                                           <span>{jtem.quantity}件</span>
                                         </div>
                                         <div className="sku">{jtem.sku}</div>

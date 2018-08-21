@@ -17,6 +17,7 @@ import Integral from '@pages/My/Integral'
 import IntegralDetail from '@pages/My/IntegralDetail'
 import Address from '@pages/My/Address'
 import AddressAdd from '@pages/My/AddressAdd'
+import AddressEdit from '@pages/My/AddressEdit'
 
 class Mypage extends Component {
     render(){
@@ -28,6 +29,7 @@ class Mypage extends Component {
                 <Route exact path='/my/integraldetail' component={IntegralDetail}></Route>
                 <Route exact path='/my/address' component={Address}></Route>
                 <Route exact path='/my/addressadd' component={AddressAdd}></Route>
+                <Route exact path='/my/addressedit' component={AddressEdit}></Route>
                 <Route exact path='/my/orderlist' component={Orderlist}></Route>
                 <Route exact path='/my/orderdetail/:orderId' component={OrderDetail}></Route>
                 <Route exact path='/my/helpback' component={Helpback}></Route>

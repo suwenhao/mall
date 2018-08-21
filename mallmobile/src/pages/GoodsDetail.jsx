@@ -5,7 +5,7 @@ import {Carousel,Stepper,Toast} from 'antd-mobile'
 import '@common/styles/goodsdetail.scss'
 import 'react-photoswipe/lib/photoswipe.css'
 import {PhotoSwipe} from 'react-photoswipe'
-import {unique} from '@common/js/util.js'
+import {unique,baseUrl,imgUrl,getToken} from '@common/js/util.js'
 import Loading from '@base/Loading'
 import classnames from 'classnames'
 import axios from 'axios'
@@ -27,6 +27,8 @@ class GoodsDetail extends Component {
       standard:null,
       productName:null,
       productImage:null,
+      productPrice:null,
+      introduction:"",
       specCount:null,
       specData:null,
       specNameArr:null,
@@ -49,7 +51,6 @@ class GoodsDetail extends Component {
       }
     }
   }
-
   //计算窗口宽高
   calcWindow(){
     return {
@@ -88,18 +89,41 @@ class GoodsDetail extends Component {
       }
     })
   }
+  //获取商品信息详情
+  getGoodsDetail(){
+    (async ()=>{
+      let goodId = this.props.match.params.id
+      console.log(goodId)
+      let params = {
+        goodId
+      }
+      let res = await axios.get(baseUrl+'/goodDetail',{params}).then(res=>res);
+      let {data} = res.data
+      console.log(data)
+      //introduction
+      this.setState({
+        introduction:data.data.introduction
+      })
+    })()
+  }
   //获取商品信息
   getGoodsInfo(){
     (async ()=>{
-      let res = await axios.get('/api/alliance/goodInfo').then(res=>res);
+      let goodId = this.props.match.params.id
+      console.log(goodId)
+      let params = {
+        goodId
+      }
+      let res = await axios.get(baseUrl+'/goodsInfo',{params}).then(res=>res);
       let {data} = res.data
-      data.productImage = 'images/test/'+ data.productImage; 
+      console.log(data)
+      data.productImage = imgUrl+ data.productImage; 
       let pictures = []
       //渲染数据
       if (data.pictures) {
           pictures = data.pictures.split(',')
           for (var i in pictures) {
-              pictures[i] = 'images/test/' + pictures[i]
+              pictures[i] = imgUrl + pictures[i]
           }
           pictures.unshift(data.productImage)
       }
@@ -108,7 +132,7 @@ class GoodsDetail extends Component {
       }
       let picobj=pictures.map(v=>{
         return {
-          src:require(`@common/${v}`)
+          src:v
         }
       })
       data.picobjs=picobj
@@ -290,7 +314,7 @@ class GoodsDetail extends Component {
         val:1,
         stockId: stockId,
         allBtn: true,
-        popPrice: popPrice
+        popPrice: popPrice.toFixed(2)
       })
     }
   }
@@ -321,16 +345,24 @@ class GoodsDetail extends Component {
         if (this.state.val > stockNum) {
           Toast.info('库存不足',1);
         } else {
-          let url = '/alliance/cart/addCart'
-          let params = {
-            token: that.state.token,
-            productId: that.state.goodId,
-            quantity: this.state.val,
-            skuId: that.state.stockId
-          }
-          this.props.history.push({
-            pathname:'/order'
-          })
+            let params = {
+              token: getToken(),
+              productId: that.state.goodId,
+              quantity: this.state.val,
+              skuId: that.state.stockId
+            }
+            $.ajax({
+              type:"get",
+              url:baseUrl+'/cart/addCart',//添加自己的接口链接
+              data:params,
+              dataType:'json',
+              success(res){
+                  Toast.info('加入购物车成功',1)
+              },
+              error(err){
+                  Toast.info('加入购物车失败',1)
+              }
+            })
         }
       } else {
         Toast.info('请选择规格',1);
@@ -383,6 +415,7 @@ class GoodsDetail extends Component {
       self.resize()
     })
     this.getGoodsInfo()
+    this.getGoodsDetail()
   }
   render() {
     let prevPath = sessionStorage.getItem('__search_prev_path__')
@@ -398,6 +431,12 @@ class GoodsDetail extends Component {
         <Header returnbtn={true} title="商品详情" pathname={goodsPrevPath||'/'}></Header>
         {/* 头部-> */}
         {/* <-body */}
+        <div className="cart-icon" onClick={()=>{
+          sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+          this.props.history.push('/cart')
+        }}>
+          <img src={require(`@common/images/cart_w.png`)} alt=""/>
+        </div> 
         {
         this.state.loading?
         <Loading/>
@@ -454,9 +493,9 @@ class GoodsDetail extends Component {
                 <div className="goods-title">
                 {this.state.data&&this.state.data.productName}
                 </div>
-                <div className="goods-favour">
+                {/* <div className="goods-favour">
                   收藏
-                </div>
+                </div> */}
               </div>
               <div className="goods-desc">
               {this.state.data&&this.state.data.desc}
@@ -467,7 +506,7 @@ class GoodsDetail extends Component {
           <div className="price-wrap">
               <div className="price">
                 <span><i>￥</i>{this.state.data&&this.state.popPrice}</span>
-                <span>￥{this.state.data&&this.state.data.originaPrice}</span>
+                <span>￥{this.state.data&&this.state.data.productPrice.toFixed(2)}</span>
               </div>
               <div className="scoket">
                 库存 <span>{this.state.data&&this.state.stockNum}</span>
@@ -533,7 +572,7 @@ class GoodsDetail extends Component {
           {/* 规格--> */}
           <div className="info-wrap">
             <div className="info-header">商品详情</div>
-            <div className="info-body" dangerouslySetInnerHTML = {{ __html:this.state.data&&this.state.data.introduction }}>
+            <div className="info-body" dangerouslySetInnerHTML = {{ __html:this.state.introduction!==""?this.state.introduction:"暂无商品详情" }}>
             </div>
           </div>
         </div>
@@ -544,7 +583,9 @@ class GoodsDetail extends Component {
             <img src={require(`@common/images/msg@default.png`)} alt="客服"/>
             <span>客服</span>
           </div>
-          <button className="btn-orange">加入购物车</button>
+          <button className="btn-orange" onClick={()=>{
+            this.addGoodOrCart()
+          }}>加入购物车</button>
           <button onClick={()=>{
             this.buyImmediately()
           }}>购买</button>

@@ -6,7 +6,8 @@ import {ActionSheet, Toast } from 'antd-mobile';
 import MyHeaderWrap from '@components/My/My/MyHeaderWrap'
 import MyOrder from '@components/My/My/MyOrder'
 import Header from '@components/Header/Header'
-
+import $ from 'jquery'
+import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
 import '@common/styles/my.scss'
 
 class My extends Component {
@@ -26,10 +27,12 @@ class My extends Component {
             }))
         }
     }
+    //跳转
     goto(path){
         this.props.history.push(path)
         this.props.router.changePath(path)
     }
+    //弹起分享
     showShareActionSheet(){
         var self = this;
         ActionSheet.showShareActionSheetWithOptions({
@@ -44,6 +47,28 @@ class My extends Component {
                 setTimeout(resolve, 1000);
             });
         });
+    }
+    //获取用户信息
+    getUserInfo(){
+        let params = {
+            token:getToken()
+        }
+        $.ajax({
+            type:'post',
+            url:baseUrl+'/getfocusUserMessage',
+            data:params,
+            dataType:'json',
+            success(res){
+                console.log(res)
+            },
+            error(err){
+                Toast.info('获取失败',1)
+            }
+        })
+    }
+    //挂载组件
+    componentDidMount(){
+        this.getUserInfo()
     }
     render() {
         return (

@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as loadAction from '@actions/loadAction'
+import * as routerAction from '@actions/routerAction'
 import classnames from 'classnames'
 import {Tabs} from 'antd-mobile'
 import Loading from '@base/Loading'
@@ -26,12 +27,12 @@ class Cate extends Component {
                 loading:false
             })
         }else{
-            this.props.load.loadCate()
-            this.setState({
-                loading:false
+            this.props.load.loadCate(()=>{
+                this.setState({
+                    loading:false
+                })
             })
         }
-        
     }
     render() {
         let cates = this.props.cates?this.props.cates.map(v=>{
@@ -81,7 +82,12 @@ class Cate extends Component {
                                                                         <div key={k} className={classnames({
                                                                             'tabs-r-item':true,
                                                                             'flex':ktem.logo?false:true
-                                                                        })}>
+                                                                        })} onClick={()=>{
+                                                                            sessionStorage.setItem('__cateId__',ktem.id)
+                                                                            sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+                                                                            this.props.router.changePath('/searchlist/null')
+                                                                            this.props.history.push('/searchlist/null')
+                                                                        }}>
                                                                             {
                                                                                 ktem.logo?
                                                                                 <img src={`http://exotic.gzfenzu.com/${ktem.logo}`} alt=""/>
@@ -124,7 +130,8 @@ export default connect(
     },
     (dispatch)=>{
         return {
-            load:bindActionCreators(loadAction,dispatch)
+            load:bindActionCreators(loadAction,dispatch),
+            router:bindActionCreators(routerAction,dispatch)
         }
     }
 )(Cate)

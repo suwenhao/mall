@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import * as routerAction from '@actions/routerAction'
+import * as goodsAction from '@actions/goodsAction'
 //组件
 //轮播图
 import Autoplay from '@/components/Main/Autoplay'
@@ -11,15 +12,16 @@ import Advertising from '@/components/Advertising'
 import Bdr from '@/components/Main/Bdr'
 import Bdrb from '@/components/Main/Bdrb'
 import Commodity from '@/components/Commodity'
-import Scroll from '@components/Scroll'
 //UI
 import {SearchBar,WingBlank} from 'antd-mobile'
+import $ from 'jquery'
+import {baseUrl} from '@common/js/util.js'
 
 class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: ['AiyWuByWklrrUDlFignR', 'TekJlZRVCjLFexlOCuWn', 'IJOtIlfsYdTyaDTRVrLI'],
+            data: [],
             adverArr:['广告1','广告2','广告3'],
             goods:[
                 {
@@ -87,7 +89,33 @@ class Main extends Component {
             ]
         }
     }
+    //初始化
+    init(){
+        this.getAutoPlay()
+        this.props.goodsPatch.overload()
+        this.props.goodsPatch.changeIsTop(true)
+        this.props.goodsPatch.getGoodsList(this.props.match.params.s)
+    }
+    getAutoPlay(){
+        let that = this
+        let params = {};
+        $.ajax({
+            type:'get',
+            url:baseUrl+'/home/carousel',
+            data:params,
+            dataType:'json',
+            success(res){
+                that.setState({
+                    data:res.data
+                })
+            },
+            error(err){
+                
+            }
+        })
+    }
     componentDidMount() {
+        this.init()
         this.fixCarousel()
     }
     //处理九宫格bug
@@ -96,54 +124,49 @@ class Main extends Component {
             window.dispatchEvent(new Event('resize'))
         },0)
     }
-    onRef(scroll){
-        console.log(scroll)
-    }
     render() {
         return (
             <div className="main-box" style={{height:'100%'}}>
-                <Scroll onRef={(scroll)=>{
-                    this.onRef(scroll)
-                }}>
-                    <div className="header">
-                        <WingBlank>
-                            <SearchBar placeholder="搜索" onFocus={()=>{
-                                sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
-                                this.props.history.push('/search')
-                                this.props.router.changePath('/search')
-                            }}/>
-                        </WingBlank>
-                    </div>
-                    <div className="body">
-                        {/*轮播图*/}
-                        <Autoplay data={this.state.data}/>
-                        {/*九宫格*/}
-                        {/* <Grid data={data} isCarousel onClick={_el => console.log(_el)} /> */}
-                        {/*广告*/}
-                        <div className="advertising">
-                            <Advertising data={this.state.adverArr}></Advertising>
-                        </div>
-                        {/*商品*/}
-                        <Bdr data={this.state.goods}></Bdr>
-                        {/*商品*/}
-                        <Bdr cls="bdr1-item" data={this.state.goods}></Bdr>
-                        {/*商品*/}
-                        <Bdrb data={this.state.goods}></Bdrb>
-                        {/*商品*/}
-                        <Commodity data={this.state.goods1}></Commodity>
-                    </div>
-                </Scroll>
-
+                <div className="header">
+                    <WingBlank>
+                        <SearchBar placeholder="搜索" onFocus={()=>{
+                            sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+                            this.props.history.push('/search')
+                            this.props.router.changePath('/search')
+                        }}/>
+                    </WingBlank>
+                </div>
+                <div className="body">
+                    {/*轮播图*/}
+                    <Autoplay data={this.state.data}/>
+                    {/*九宫格*/}
+                    {/* <Grid data={data} isCarousel onClick={_el => console.log(_el)} /> */}
+                    {/*广告*/}
+                    {/* <div className="advertising">
+                        <Advertising data={this.state.adverArr}></Advertising>
+                    </div> */}
+                    {/*商品*/}
+                    {/* <Bdr data={this.state.goods}></Bdr> */}
+                    {/*商品*/}
+                    {/* <Bdr cls="bdr1-item" data={this.state.goods}></Bdr> */}
+                    {/*商品*/}
+                    {/* <Bdrb data={this.state.goods}></Bdrb> */}
+                    {/*商品*/}
+                    <Commodity data={this.props.goods}></Commodity>
+                </div>
             </div>
         )
     }
 }
 
 export default connect(
-    null,
+    (state) => ({
+        goods:state.goodsReducer.goods
+    }),
     (dispatch)=>{
         return {
-            router:bindActionCreators(routerAction,dispatch)
+            router:bindActionCreators(routerAction,dispatch),
+            goodsPatch:bindActionCreators(goodsAction,dispatch)
         }
     }
 )(Main)

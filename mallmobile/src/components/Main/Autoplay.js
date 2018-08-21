@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 import PropTypes from 'proptypes'
+import {withRouter} from 'react-router-dom'
 import {Carousel} from 'antd-mobile'
+import {imgUrl} from '@common/js/util.js'
 
 class Autoplay extends Component {
     static propTypes = {
@@ -20,18 +22,23 @@ class Autoplay extends Component {
     render() {
         return (
             <Carousel
-                autoplay={false}
+                autoplay={true}
                 infinite
                 beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
                 afterChange={index => console.log('slide to', index)}
             >
-                {this.props.data.map(val => (
+                {this.props.data.map((item,i) => (
                     <a
-                        key={val}
+                        key={i}
+                        onClick={()=>{
+                            this.props.history.push('/goods/'+item.productId)
+                            sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+                            sessionStorage.setItem('__goods_prev_path__',this.props.location.pathname)
+                        }}
                         style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
                     >
                         <img
-                            src={`https://zos.alipayobjects.com/rmsportal/${val}.png`}
+                            src={`${imgUrl}${item.img}`}
                             alt=""
                             style={{touchAction:'none', width: '100%', verticalAlign: 'top' }}
                             onLoad={(e) => {
@@ -46,4 +53,4 @@ class Autoplay extends Component {
     }
 }
 
-export default Autoplay
+export default withRouter(Autoplay)

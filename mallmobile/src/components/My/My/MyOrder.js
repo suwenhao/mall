@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import {Modal} from 'antd-mobile'
 import {withRouter} from 'react-router-dom'
 
 class MyOrder extends Component {
@@ -20,17 +21,25 @@ class MyOrder extends Component {
                 <a onClick={()=>{
                     this.gotoOrder(2)
                 }}>
+                    <img src={require('@common/images/wait.png')} alt=""/>
+                    <span>待发货</span>
+                </a>
+                <a onClick={()=>{
+                    this.gotoOrder(3)
+                }}>
                     <img src={require('@common/images/unrecieve.png')} alt=""/>
                     <span>待收货</span>
                 </a>
                 <a onClick={()=>{
-                    this.gotoOrder(3)
+                    this.gotoOrder(6)
                 }}>
                     <img src={require('@common/images/assess.png')} alt=""/>
                     <span>待评价</span>
                 </a>
                 <a onClick={()=>{
-                    this.gotoOrder(4)
+                    Modal.alert('提示', '请与店家联系', [
+                        { text: '确定', onPress: () => console.log('cancel'), style: 'default' }
+                    ])
                 }}>
                     <img src={require('@common/images/consult.png')} alt=""/>
                     <span>退货/售后</span>

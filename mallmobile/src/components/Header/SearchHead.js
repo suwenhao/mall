@@ -41,7 +41,7 @@ class SearchHead extends Component {
     }
     submit(){
         if(this.state.val===""){
-            Toast.info("请输入搜索条件",1)
+            this.props.goto(null)
         }else{
             this.props.goto(this.state.val)
         }

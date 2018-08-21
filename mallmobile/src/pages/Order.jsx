@@ -3,6 +3,8 @@ import {connect} from 'react-redux'
 import { Button, Toast, Picker, List, TextareaItem } from 'antd-mobile'
 import TextHeader from '@components/Header/TextHeader'
 import _ from 'underscore'
+import $ from 'jquery'
+import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
 import Loading from '@base/Loading'
 import '@common/styles/orderdetail.scss'
 import axios from 'axios'
@@ -16,6 +18,7 @@ class Order extends Component {
         orderInfo:null,
         addressList:[],
         addr:null,
+        memo:'',
         presetArr:[
           {
             label:'快递',
@@ -28,6 +31,8 @@ class Order extends Component {
             value:3
           }
         ]
+        ,
+
       }
   }
   //获取订单
@@ -79,14 +84,18 @@ class Order extends Component {
   //获取我的地址列表
   getAddressList(cb){
     (async ()=>{
-      let params = { token: this.state.token}
-      let {data} = await axios.get('/api/alliance/listAddress').then(res=>res);
+      let params = { token: getToken()}
+      let {data} = await axios.get(baseUrl+'/address/list',{params}).then(res=>res).catch( (error)=>{
+        this.setState({
+          loading:false
+        })
+      });
       console.log(data)
       this.setState({
-        addressList:data.data,
+        addressList:data.data.data,
         loading:false
       })
-      cb && cb(data.data);
+      cb && cb(data.data.data);
     })()
   }
   //设置显示的地址
@@ -120,6 +129,117 @@ class Order extends Component {
             })
         }
     }
+  }
+  //提交订单
+  clickAccount(){
+      //确认订单
+      var that = this;
+      if (that.state.addressList.length < 1) {
+          Toast.info("请选择送货地址",1);
+          return false;
+      }
+      let cart={}
+      let data=JSON.parse(sessionStorage.getItem('goodDetailData'))
+      let grrs=[]
+      data.items.forEach(item=>{
+          grrs.push({
+            productId:item.productId,
+            skuId:item.skuId,
+            quantity:item.selectQuantity
+        })
+      })
+      cart={
+        pickupWay:data.pickupWay.split(',')[0],
+        goods:grrs
+      }
+      let params = {
+        token:getToken(),
+        cartStr:JSON.stringify([cart]),
+        payMethod:'1',
+        receiverId:that.state.addr.id,
+        memo:this.state.memo
+      }
+      // var params={
+      //     token:getToken(),
+      //     agentCode:'',
+      //     productId:cart['goods'][0]['productId'],
+      //     skuId:cart['goods'][0]['skuId'],
+      //     quantity:cart['goods'][0]['quantity'],
+      //     payMethod:'1',
+      //     receiverId:that.state.addr.id,
+      //     pickupWay:cart['pickupWay'],
+      //     deliveryDate:'',
+      //     memo:this.state.memo
+      // }
+      console.log(params)
+      $.ajax({
+          type:'post',
+          data:params,
+          url:baseUrl+'/order/cartSettlement',
+          success(res){
+              console.log(res)
+              if(res.code == 0){
+                  let orderId = res.data.orderId;
+                  let orderMoney = that.state.orderInfo.totalPrice;
+                  that.state.orderId=orderId;
+                  that.payment(orderId,orderMoney);
+              } else if(res.code == 2){
+                  Toast.info(res.message,1);
+              }
+          
+          },
+          error(){
+              Toast.info('下单失败',1);
+          }
+      })
+  }
+  //支付
+  payment(orderId,orderMoney){
+      var that = this;
+      var reqType = 1;  
+      var params = {
+          token: getToken(),
+          totalFee: orderMoney,
+          outTradeNo: orderId,
+          reqType: reqType,
+          body:''
+      };
+      $.ajax({
+          type:'post',
+          data:params,
+          url:baseUrl+'/getWxPrepayId',
+          dataType:'json',
+          success(res){
+              if(res.code == 0){
+                  console.log(res)
+                  var data=res.data
+                  try {
+                    if(window.WeixinJSBridge){
+                      window.WeixinJSBridge.invoke(
+                          'getBrandWCPayRequest', {
+                              "appId":data.appId,     //公众号名称，由商户传入     
+                              "timeStamp":data.timeStamp,         //时间戳，自1970年以来的秒数     
+                              "nonceStr":data.nonceStr, //随机串     
+                              "package":data.package,     
+                              "signType":data.signType,         //微信签名方式：     
+                              "paySign":data.paySign //微信签名 
+                          },
+                          function(res){     
+                              if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                                  Toast.info("支付成功",1);
+                                  that.props.history.push('/my/orderdetail/'+orderId)
+                              }else{
+                                that.props.history.push('/my/orderdetail/'+orderId)
+                              } // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+                          }
+                      );
+                    }
+                  } catch (error) {
+                      
+                  }
+              }
+          }
+    })
   }
   componentDidMount(){
     this.getOrderInfo()
@@ -160,7 +280,15 @@ class Order extends Component {
                                 {this.state.addr&&this.state.addr.cityName}
                                 {this.state.addr&&this.state.addr.countyName}
                                 {this.state.addr&&this.state.addr.address}
+                                &nbsp;
+                                
                               </div>
+                              {
+                                  this.state.addr&&this.state.addr.isDefault
+                                  ?
+                                  <div style={{color:'red'}}>默认</div>
+                                  :null
+                              }
                           </div>
                           :
                           <div className="info">
@@ -180,7 +308,7 @@ class Order extends Component {
                               return (
                                 <div key={i} className="goods-item">
                                   <div className="goods-cover">
-                                      <img src="http://img10.360buyimg.com/n2/jfs/t18046/308/1462286824/185242/64c962d9/5acaf911N16a15a39.jpg.dpg"/>
+                                      <img src={item.productImage} alt={item.productName}/>
                                   </div>
                                   <div className="goods-cont">
                                       <div className="goods-info">
@@ -215,7 +343,12 @@ class Order extends Component {
                           title="留言"
                           placeholder="输入留言"
                           rows={3}
-                          ref={el => this.autoFocusInst = el}
+                          value={this.state.memo}
+                          onChange={(val)=>{
+                            this.setState({
+                              memo:val
+                            })
+                          }}
                           autoHeight
                         />
                       </List>
@@ -228,7 +361,9 @@ class Order extends Component {
                         <p className="total">总价：<span>¥ {this.state.orderInfo&&this.state.orderInfo.totalPrice}</span></p>
                     </div>
                     <div className="section">
-                      <Button type="primary">在线支付</Button>
+                      <Button type="primary" onClick={()=>{
+                        this.clickAccount()
+                      }}>在线支付</Button>
                     </div>
                 </div>
                 :<div style={{padding:'10px',textAlign:'center'}}>缺少参数</div>

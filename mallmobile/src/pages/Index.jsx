@@ -3,6 +3,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import * as routerAction from '@actions/routerAction'
 import {Route,Switch,Redirect} from 'react-router-dom'
+import {getToken, locationHref} from '@common/js/util'
 
 //css
 import '@common/styles/index.scss'
@@ -18,11 +19,16 @@ import Search from '@/pages/Search';
 import Searchlist from '@/pages/Searchlist';
 
 class Index extends Component {
-    // componentDidMount(){
-    //     let prev=sessionStorage.getItem('__search_prev_path__')
-    //     this.props.history.push(prev||'/')
-    // }
+    authRoute(){
+        let token = getToken()
+        if(token){
+            return;
+        }else{
+            window.location.href = locationHref()
+        }
+    }
     render(){
+        this.authRoute()
         let pathTF = false;
         this.props.paths.forEach(v=>{
             if(this.props.pathname===null&&(this.props.location.pathname===v)){
@@ -34,6 +40,7 @@ class Index extends Component {
             }
         })
         this.props.router.changePath(this.props.location.pathname)
+
         return (
             <div className="index-page">
                 <div className="main" style={{
