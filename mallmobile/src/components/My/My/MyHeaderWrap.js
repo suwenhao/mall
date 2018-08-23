@@ -1,6 +1,10 @@
 import React, { Component } from 'react'
+import {Toast} from 'antd-mobile'
 
 class MyHeaderWrap extends Component {
+    tip(){
+        Toast.info('正在努力开发中',1)
+    }
     render(){
         return (
             <div className="my-header-wrap">
@@ -8,15 +12,15 @@ class MyHeaderWrap extends Component {
                     <div className="my-header-main">
                         <div className="my-header-avatar">
                             <div className="my-header-avatar-img">
-                                <img src={require('@common/images/avatar.jpg')} alt="avatar"/>
+                                <img src={this.props.userInfo.headimgurl} alt="avatar"/>
                             </div>
                         </div>
                         <div className="my-header-msg">
                             <div className="name">
-                                数轼
+                            {this.props.userInfo.nickName}
                             </div>
                             <div className="pin">
-                            用户名：13229710047_p
+                            等级：1
                             </div>
                         </div>
                         <a 
@@ -34,6 +38,9 @@ class MyHeaderWrap extends Component {
                             地址管理
                         </a>
                         <a 
+                            onClick={()=>{
+                                this.tip()
+                            }}
                             style={{
                                 top:'42px',
                                 backgroundImage:'url('+require('@common/images/msg.png')+')',
@@ -57,14 +64,14 @@ class MyHeaderWrap extends Component {
                                 this.props.goto('/my/purse');
                                 sessionStorage.setItem('__search_prev_path__','/my')
                             }}>
-                                <b>87454.00</b>
+                                <b>￥{this.props.userInfo.balance}</b>
                                 <span>余额</span>
                             </a>
                             <a onClick={()=>{
                                 this.props.goto('/my/integral');
                                 sessionStorage.setItem('__search_prev_path__','/my')
                             }}>
-                                <b>87454.00</b>
+                                <b>{this.props.userInfo.integral}</b>
                                 <span>积分</span>
                             </a>
                             {/* <a onClick={()=>{

@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import Header from '@components/Header/Header'
-import {Carousel,Stepper,Toast} from 'antd-mobile'
+import {Carousel,Stepper,Toast, Checkbox} from 'antd-mobile'
 import '@common/styles/goodsdetail.scss'
 import 'react-photoswipe/lib/photoswipe.css'
 import {PhotoSwipe} from 'react-photoswipe'
-import {unique,baseUrl,imgUrl,getToken} from '@common/js/util.js'
+import {unique,baseUrl,imgUrl,getToken,computingTime,formatTime} from '@common/js/util.js'
 import Loading from '@base/Loading'
 import classnames from 'classnames'
 import axios from 'axios'
@@ -17,6 +17,7 @@ class GoodsDetail extends Component {
     this.state = {
       loading:true,
       data: null,
+      loading1:false,
       val: 1,
       sku:null,
       token:null,
@@ -48,7 +49,9 @@ class GoodsDetail extends Component {
         escKey: true,
         shareEl: false,
         shareButtons:[]
-      }
+      },
+      commentIndex:1,
+      comments:[]
     }
   }
   //计算窗口宽高
@@ -112,7 +115,8 @@ class GoodsDetail extends Component {
       let goodId = this.props.match.params.id
       console.log(goodId)
       let params = {
-        goodId
+        goodId,
+        token:getToken()
       }
       let res = await axios.get(baseUrl+'/goodsInfo',{params}).then(res=>res);
       let {data} = res.data
@@ -141,6 +145,7 @@ class GoodsDetail extends Component {
         loading:false
       })
       this.filterData(data)
+      this.requestComment(1);
     })()
   }
   //设置初始
@@ -407,6 +412,99 @@ class GoodsDetail extends Component {
       }
     }
   }
+  //评论切换
+  checkComment (i) {
+    this.setState({
+      tab:i,
+      loading1:true,
+      comments:[]
+    },()=>{
+      this.requestComment(i)
+    })
+  }
+  //跳转到评论页
+  gotoComment(){
+    this.props.history.push('/comments/'+this.state.goodId)
+  }
+  //图片宽高
+  imgLoad(e,index,j){
+    let comments=this.state.comments;
+    let productCommentImgs=comments[index].productCommentImgs.concat()
+    productCommentImgs[j].w=e.currentTarget.width;
+    productCommentImgs[j].h=e.currentTarget.height;
+    comments[index].productCommentImgs=productCommentImgs;
+    this.setState({
+      comments
+    })
+  }
+  //关闭图片预览
+  handleClose1(index){
+      let comments=this.state.comments;
+      comments[index].isOpen=false;
+      this.setState({
+        comments
+      })
+  }
+  //获取评论
+  requestComment(i){
+    let that=this;
+    let params = {
+        productId: this.state.goodId,
+        commentType: i,
+        pageSize: 2,
+        pageNumber: 1
+    };
+    try {
+        $.ajax({
+            type:"post",
+            url:baseUrl+'/getCommentPage',//添加自己的接口链接
+            timeOut:5000,
+            data:params,
+            dataType:'json',
+            success(res){
+                console.log(res)
+                let comments = res.data.data
+                if (comments.length < 1) {
+                    that.setState({
+                      comments:[],
+                      loading1:false
+                    })
+                } else {
+                    for (let i = 0; i < comments.length; i++) {
+                        //计算评论时间距离
+                        comments[i].productCommentImgs=comments[i].productCommentImgs.map(v=>{
+                          return {
+                            ...v,
+                            w:500,
+                            h:500,
+                            src:v.imgUrl
+                          }
+                        })
+                        comments[i].isOpen=false;
+                        comments[i].options={
+                            index: 0,
+                            escKey: true,
+                            shareEl: false,
+                            shareButtons:[]
+                        }
+                        comments[i].distanceTime = computingTime(comments[i].commentTime);
+                        //处理评论日期
+                        comments[i].commentTime = formatTime(new Date(comments[i].commentTime));
+                    }
+                    that.setState({
+                      comments,
+                      loading1:false
+                    })
+                }
+            },
+            error(){
+                Toast.info('请求出错',1)
+            }
+        })
+    } catch (error) {
+        console.log('客户端404，没有这个接口')
+    }  
+  }
   //组件装载完毕
   componentDidMount(){
     let self = this
@@ -570,6 +668,131 @@ class GoodsDetail extends Component {
             {/* 商品数量 */}
           </div>
           {/* 规格--> */}
+          <div className="info-wrap">
+            <div className="info-header comment">
+              <span>
+                评论
+              </span>
+              <span>
+                <img src={require('@common/images/next.png')} alt=""/>
+              </span>
+            </div>
+            <div className="info-body">
+                <div className="info-body-top">
+                    <div className="body-top-item">
+                      <Checkbox checked={this.state.commentIndex===1?true:false} onChange={()=>{
+                        this.setState({commentIndex:1},()=>{
+                          this.checkComment(1)
+                        })
+                      }}/>
+                      <span>好评({this.state.data&&this.state.data.commentTotal.goodNum})</span>
+                    </div>
+                    <div className="body-top-item">
+                      <Checkbox checked={this.state.commentIndex===2?true:false} onChange={()=>{
+                        this.setState({commentIndex:2},()=>{
+                          this.checkComment(2)
+                        })
+                      }}/>
+                      <span>中评({this.state.data&&this.state.data.commentTotal.mediumNum})</span>
+                    </div>
+                    <div className="body-top-item">
+                      <Checkbox checked={this.state.commentIndex===3?true:false} onChange={()=>{
+                        this.setState({commentIndex:3},()=>{
+                          this.checkComment(3)
+                        })
+                      }}/>
+                      <span>差评({this.state.data&&this.state.data.commentTotal.badNum})</span>
+                    </div>
+                    <div className="body-top-item">
+                      <Checkbox checked={this.state.commentIndex===4?true:false} onChange={()=>{
+                        this.setState({commentIndex:4},()=>{
+                          this.checkComment(4)
+                        })
+                      }}/>
+                      <span>有图({this.state.data&&this.state.data.commentTotal.imgNum})</span>
+                    </div>
+                </div>
+                <div className="info-body-content">
+                    <ul>
+                      {
+                        this.state.loading1?
+                        <Loading/>
+                        :null
+                      }
+                      {
+                        this.state.comments.length>0?
+                        this.state.comments.map((item,i)=>{
+                          return (
+                            <li key={i}>
+                              <div className="comment-top">
+                                <label>
+                                  <img src={item.fansHeadImg} alt=""/>
+                                </label>
+                                <span className="comment-content">
+                                  <div className="comment-name">
+                                    <span>{item.fansName}</span>
+                                    <span>{item.commentTime}</span>
+                                  </div>
+                                  <div className="comment-date">
+                                    <span>{item.distanceTime}</span>
+                                    <span>{item.skuValue}</span>
+                                  </div>
+                                  <p>不错不错</p>
+                                </span>
+                              </div>
+                              <div className="comment-img">
+                                {
+                                  item.productCommentImgs.map((jtem,j)=>{
+                                    return(
+                                      <div key={j} style={{
+                                        backgroundImage:`url(${jtem.imgUrl}`,
+                                        backgroundSize:jtem.w>=jtem.h?'100% auto':'auto 100%',
+                                      }} onClick={()=>{
+                                          let comments = this.state.comments.concat();
+                                          comments[i].isOpen=true;
+                                          comments[i].options={
+                                              ...comments[i].options,
+                                              index:j
+                                          };
+                                          this.setState({
+                                            comments
+                                          })
+                                      }} className="img">
+                                        <img src={jtem.imgUrl} style={{
+                                              display:'none'
+                                          }} onLoad={(e)=>{
+                                              this.imgLoad(e,i,j)
+                                          }} alt=""/>
+                                      </div>
+                                    )
+                                  })
+                                }    
+                              </div>
+                              {
+                                  item.isOpen?
+                                  <PhotoSwipe isOpen={item.isOpen} items={item.productCommentImgs} options={item.options} onClose={()=>{
+                                      this.handleClose1(i)
+                                  }}/>
+                                  :null
+                              }
+                            </li>
+                          )
+                        })
+                        :<li className="order-tip">暂无评论</li>
+                      }
+                    </ul>
+                    {
+                        this.state.comments.length>0?
+                        <div style={{
+                          borderTop:'1px solid #eee'
+                        }} className="order-tip" onClick={()=>{
+                          this.gotoComment()
+                        }}>查看更多</div>
+                        :null
+                    }
+                </div>
+            </div>
+          </div>
           <div className="info-wrap">
             <div className="info-header">商品详情</div>
             <div className="info-body" dangerouslySetInnerHTML = {{ __html:this.state.introduction!==""?this.state.introduction:"暂无商品详情" }}>

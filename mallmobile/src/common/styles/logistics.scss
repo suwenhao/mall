@@ -1,0 +1,120 @@
+.logistics-page{
+    p,h1,h2,h3,h4,li,ul,ol,a,b{
+        margin:0;
+        padding:0;
+        font-style: normal;
+        font-weight: normal;
+    }
+    .content{
+        flex:1;
+        background-color: #f6f6f6;
+        overflow-y: auto;
+    }
+    .track_info{
+        margin-bottom: 10px;
+        position: relative;
+        padding: 12px 10px;
+        font-size: 12px;
+        background-color: #fff;
+    }
+    .track_info_item {
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        color: #333;
+        padding-top: 3px;
+    }
+    .track_info_item_label {
+        min-width: 70px;
+        color: #999;
+    }
+    .track_info_item_content {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+    }
+    .track_shipflow {
+        margin-top: 15px;
+        padding: 0 10px;
+        background-color: #fff;
+    }
+    .track_shipflow_item {
+        position: relative;
+        display: -webkit-box;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-wrap: wrap;
+        flex-wrap: wrap;
+    }
+    .track_shipflow_item_msg {
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        flex: 1;
+        padding: 15px 0;
+    }
+    .track_shipflow_item_status {
+        position: relative;
+        margin: 15px 10px 0 0;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+        font-size: 10px;
+        text-align: center;
+        border-radius: 10px;
+        color: #666;
+        background-color: #f7f7f7;
+    }
+    .track_shipflow_item_status.type_dot {
+        margin: 24px 15px 0 5px;
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: #ccc;
+    }
+    .track_shipflow_item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        pointer-events: none;
+        background-color: #e5e5e5;
+        width: 1px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        top: 37px;
+        left: 10px;
+        bottom: -20px;
+    }
+    @media only screen and (-webkit-min-device-pixel-ratio: 2){
+        .track_shipflow_item:not(:last-child)::after {
+            transform: scaleX(.5);
+            transform-origin: 0 50%;
+        }
+    }
+    .track_shipflow_item_msg_text {
+        color: #333;
+        font-size: 12px;
+        line-height: 1.35em;
+    }
+    .track_shipflow_item_msg_time {
+        font-size: 12px;
+        color: #999;
+    }
+    .track_shipflow_item.cur::after {
+        background: linear-gradient(bottom,#e8e8ed,#e64b4e);
+        background: linear-gradient(0deg,#e8e8ed,#e64b4e);
+    }
+    .track_shipflow_item.cur .track_shipflow_item_status {
+        color: #fff;
+        background-color: #ff0000;
+    }
+    .track_shipflow_item.cur .track_shipflow_item_msg_text, .track_shipflow_item.cur .track_shipflow_item_msg_time {
+        color: #ff0000;
+    }
+    .track_shipflow_item.cur .track_shipflow_item_msg_text, .track_shipflow_item.cur .track_shipflow_item_msg_time {
+        color: #ff0000;
+    }
+    .nodata{
+        text-align: center;
+    }
+}

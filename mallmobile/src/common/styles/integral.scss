@@ -68,41 +68,49 @@
                 }
             }
         }
-        .integral-item:not(:first-child){
-            border-top:1px solid #eee;
-        }
-        .integral-detail{
-            background-color: #fff;
-            .integral-item{
-                position: relative;
-                padding:10px;
-                height:50px;
-                .i-left{
-                    margin-right:80px;
-                    h2{
-                        margin:0;
-                        padding:0;
-                        font-size:16px;
-                        margin-bottom:10px;
-                    }
-                }
-                .i-right{
-                    width:80px;
-                    position: absolute;
-                    top:10px;
-                    right:10px;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    font-size:20px;
-                    line-height:50px;
-                    color:#000;
-                    font-weight: bold;
-                }
-                .red{
-                    color:#ff5b05;
-                }
-            }
+        
+    }
+}
+.integral-item:not(:first-child){
+    border-top:1px solid #eee;
+}
+.integral-detail{
+    background-color: #fff;
+}
+.integral-item{
+    position: relative;
+    padding:10px;
+    height:50px;
+    .i-left{
+        margin-right:80px;
+        h2{
+            margin:0;
+            padding:0;
+            font-size:16px;
+            margin-bottom:10px;
         }
     }
+    .i-right{
+        width:80px;
+        position: absolute;
+        top:10px;
+        right:10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size:20px;
+        line-height:50px;
+        color:#000;
+        font-weight: bold;
+    }
+    .red{
+        color:#ff5b05;
+    }
+}
+.order-tip{
+    display: flex;
+    align-items:center;
+    justify-content: center;
+    min-height: 60px;
+    color:#555;
 }

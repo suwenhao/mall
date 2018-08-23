@@ -7,99 +7,100 @@ import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
 import '@common/styles/orderdetail.scss'
 
 class OrderDetail extends Component {
-  constructor(props){
-      super(props)
-      this.state = {
-        orderId:props.match.params.orderId||null
-      }
-  }
-  //获取订单详细
-  getOrderInfo(cb){
-    let that=this
-    $.ajax({
-        type:'post',
-        data:{
-            token:getToken(),
-            orderId:this.state.orderId
-        },
-        url:baseUrl+'/order/detail',
-        success(res){
-            console.log(res)
-            if(res.code == 0){
-                that.setState({
-                    order:res.data.data
-                })
-                //获取物流详细信息
-                if(res.data.data.trackingNo){
-                    that.gettrackingNo()
-                }
-            }else if(res.code==2){
-                Toast.info(res.message,1);
-            }
-            cb&&cb()
+    constructor(props){
+        super(props)
+        this.state = {
+            orderId:props.match.params.orderId||null,
+            trackingTxt:'暂无物流信息'
         }
-    })
-  }
-  //支付
-  payment(){
-    let that = this;
-    let reqType = 1;  //请求类型 1-订单 2-卡券 3-团购 4-充值 5-其他
-    let params = {
-        token: getToken(),
-        totalFee: this.state.order.orderMoney,
-        outTradeNo: this.state.orderId,
-        reqType: reqType,
-        body:''
-    };
-    $.ajax({
-        type:'post',
-        data:params,
-        url:baseUrl+'/getWxPrepayId',
-        dataType:'json',
-        success(res){
-            if(res.code == 0){
-                var data=res.data
-                try {
-                    if(window.WeixinJSBridge){
-                        window.WeixinJSBridge.invoke(
-                            'getBrandWCPayRequest', {
-                                "appId":data.appId,     //公众号名称，由商户传入     
-                                "timeStamp":data.timeStamp,         //时间戳，自1970年以来的秒数     
-                                "nonceStr":data.nonceStr, //随机串     
-                                "package":data.package,     
-                                "signType":data.signType,         //微信签名方式：     
-                                "paySign":data.paySign //微信签名 
-                            },
-                            function(res){     
-                                if(res.err_msg == "get_brand_wcpay_request:ok" ) {
-                                    Toast.info("支付成功",1);
-                                    that.props.history.push('/my/orderlist')
-                                }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
-                            }
-                        );
-                    }
-                } catch (error) {
-                    
-                }
-            }
-        }
-    })
-  }
-  //删除按钮
-  deleteBtns(item){
-    if(item.orderStatus==4||item.orderStatus==5){
-        return <Button type="warning" size="small" onClick={()=>{
-        this.removeOrder(item)
-            return false;
-        }}>删除订单</Button>
-    }else if(item.orderStatus==1){
-        return <Button type="warning" size="small" onClick={()=>{
-            this.cancelOrder(item)
-                return false;
-            }}>取消订单</Button>
     }
-  }
-  //取消订单
+    //获取订单详细
+    getOrderInfo(cb){
+        let that=this
+        $.ajax({
+            type:'post',
+            data:{
+                token:getToken(),
+                orderId:this.state.orderId
+            },
+            url:baseUrl+'/order/detail',
+            success(res){
+                console.log(res)
+                if(res.code == 0){
+                    that.setState({
+                        order:res.data.data
+                    })
+                    //获取物流详细信息
+                    if(res.data.data.trackingNo){
+                        that.gettrackingNo(res.data.data)
+                    }
+                }else if(res.code==2){
+                    Toast.info(res.message,1);
+                }
+                cb&&cb()
+            }
+        })
+    }
+    //支付
+    payment(){
+        let that = this;
+        let reqType = 1;  //请求类型 1-订单 2-卡券 3-团购 4-充值 5-其他
+        let params = {
+            token: getToken(),
+            totalFee: this.state.order.orderMoney,
+            outTradeNo: this.state.orderId,
+            reqType: reqType,
+            body:''
+        };
+        $.ajax({
+            type:'post',
+            data:params,
+            url:baseUrl+'/getWxPrepayId',
+            dataType:'json',
+            success(res){
+                if(res.code == 0){
+                    var data=res.data
+                    try {
+                        if(window.WeixinJSBridge){
+                            window.WeixinJSBridge.invoke(
+                                'getBrandWCPayRequest', {
+                                    "appId":data.appId,     //公众号名称，由商户传入     
+                                    "timeStamp":data.timeStamp,         //时间戳，自1970年以来的秒数     
+                                    "nonceStr":data.nonceStr, //随机串     
+                                    "package":data.package,     
+                                    "signType":data.signType,         //微信签名方式：     
+                                    "paySign":data.paySign //微信签名 
+                                },
+                                function(res){     
+                                    if(res.err_msg == "get_brand_wcpay_request:ok" ) {
+                                        Toast.info("支付成功",1);
+                                        that.props.history.push('/my/orderlist')
+                                    }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+                                }
+                            );
+                        }
+                    } catch (error) {
+                        
+                    }
+                }
+            }
+        })
+    }
+    //删除按钮
+    deleteBtns(item){
+        if(item.orderStatus==4||item.orderStatus==7){
+            return <Button type="warning" size="small" onClick={()=>{
+            this.removeOrder(item)
+                return false;
+            }}>删除订单</Button>
+        }else if(item.orderStatus==1){
+            return <Button type="warning" size="small" onClick={()=>{
+                this.cancelOrder(item)
+                    return false;
+                }}>取消订单</Button>
+        }
+    }
+    //取消订单
     cancelOrder(item){
         var that=this;
         Modal.alert('提示', '是否取消该订单？', [
@@ -174,11 +175,26 @@ class OrderDetail extends Component {
   //立即评论
   gotoComment(item) {
     var that = this;
-    that.props.history.push('/my/orderComment/'+item.id)
+    that.props.history.push('/my/ordercomment/'+item.orderId)
   }
   //获取物流信息
-  gettrackingNo(){
-
+  gettrackingNo(order){
+    let that=this
+    $.ajax({
+        type:'post',
+        data:{
+            token:getToken(),
+            com:order.expressCode,
+            num:order.trackingNo
+        },
+        url:baseUrl+'/order/query',
+        success(res){
+            var taeckArr=JSON.parse(res.data.result).data;
+            that.setState({
+                trackingTxt:taeckArr?taeckArr[0].context.substring(0,6):'查询无结果'
+            })
+        }
+    })
   }
   //挂载组件
   componentDidMount(){
@@ -200,13 +216,13 @@ class OrderDetail extends Component {
                             ?
                             <div className="info">
                                 <div className="desc">
-                                您的订单已签收。感谢您在京东购物，欢迎再次光临。参加评价还能赢取京豆哟。
+                                    {this.state.trackingTxt}
                                 </div>
-                                <div>2018-06-17 17:03:13</div>
+                                {/* <div>2018-06-17 17:03:13</div> */}
                             </div>
                             :
                             <div className="info">
-                                暂无物流信息
+                                {this.state.trackingTxt}
                             </div>
                         }
                         <img className="next" src={require(`@common/images/next.png`)} alt=""/>
@@ -229,7 +245,10 @@ class OrderDetail extends Component {
                         {
                             this.state.order&&(this.state.order.orderStatus==1||this.state.order.orderStatus==0)
                             ?
-                            <Button type="primary" size="small" onClick={()=>{
+                            <Button type="primary" style={{
+                                    background: '#f19325',
+                                    borderColor: '#f19325'
+                            }} size="small" onClick={()=>{
                             this.payment()
                             }}>支付订单</Button>
                             :null
@@ -237,9 +256,7 @@ class OrderDetail extends Component {
                         {
                             this.state.order&&(this.state.order.orderStatus==2)
                             ?
-                            <Button type="primary" size="small" onClick={()=>{
-                            
-                            }}>提醒发货</Button>
+                             null
                             :null
                         }
                         {
@@ -253,8 +270,11 @@ class OrderDetail extends Component {
                         {
                             this.state.order&&(this.state.order.orderStatus==6)
                             ?
-                            <Button type="primary" size="small" onClick={()=>{
-                            
+                            <Button type="primary" size="small" style={{
+                                    background: '#3884ff',
+                                    borderColor: '#3884ff'
+                            }} onClick={()=>{
+                                this.gotoComment(this.state.order)
                             }}>评价</Button>
                             :null
                         }

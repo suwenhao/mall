@@ -7,13 +7,14 @@ import MyHeaderWrap from '@components/My/My/MyHeaderWrap'
 import MyOrder from '@components/My/My/MyOrder'
 import Header from '@components/Header/Header'
 import $ from 'jquery'
-import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
+import {baseUrl,getToken} from '@common/js/util.js'
 import '@common/styles/my.scss'
 
 class My extends Component {
     constructor(props) {
         super(props);
         this.state={
+            userInfo:{},
             clicked: 'none',
             dataList:[
                 { url: 'apay.png', title: '支付宝' },
@@ -50,6 +51,7 @@ class My extends Component {
     }
     //获取用户信息
     getUserInfo(){
+        let that = this
         let params = {
             token:getToken()
         }
@@ -60,11 +62,18 @@ class My extends Component {
             dataType:'json',
             success(res){
                 console.log(res)
+                res.data.balance=res.data.balance.toFixed(2)
+                that.setState({
+                    userInfo:res.data
+                })
             },
             error(err){
                 Toast.info('获取失败',1)
             }
         })
+    }
+    tip(){
+        Toast.info("正在努力开发中",1)
     }
     //挂载组件
     componentDidMount(){
@@ -75,7 +84,7 @@ class My extends Component {
             <div className="my-page">
                 <Header title="个人中心"></Header>
                 <div className="my-main">
-                    <MyHeaderWrap goto={this.goto.bind(this)}></MyHeaderWrap>
+                    <MyHeaderWrap userInfo={this.state.userInfo} goto={this.goto.bind(this)}></MyHeaderWrap>
                     <MyOrder></MyOrder>
                     <div className="my-section">
                         <div className="my-more">
@@ -104,21 +113,27 @@ class My extends Component {
                                     <p>最好的朋友</p>
                                 </span>
                             </a>
-                            <a>
+                            <a onClick={()=>{
+                                this.tip()
+                            }}>
                                 <img src={require(`@common/images/client.jpg`)} alt=""/>
                                 <span>
                                     <div>客户服务</div>
                                     <p>真诚100,愉快购物</p>
                                 </span>
                             </a>
-                            <a>
+                            <a onClick={()=>{
+                                this.tip()
+                            }}>
                                 <img src={require(`@common/images/community.jpg`)} alt=""/>
                                 <span>
                                     <div>榴莲社区</div>
                                     <p>吃货分享</p>
                                 </span>
                             </a>
-                            <a>
+                            <a onClick={()=>{
+                                this.tip()
+                            }}>
                                 <img src={require(`@common/images/school.jpg`)} alt=""/>
                                 <span>
                                     <div>榴莲学堂</div>

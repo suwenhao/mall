@@ -76,7 +76,7 @@ class Search extends Component {
                 }
               </div>
             </div>
-            <div className="search-land search-hot">
+            {/* <div className="search-land search-hot">
               <label>
                 <span>热门搜索</span>
               </label>
@@ -91,7 +91,7 @@ class Search extends Component {
                   :<div style={{textAlign:'center',padding:'20px'}}>暂无热门</div>
                 }
               </div>
-            </div>
+            </div> */}
           </div>
           :
           <div className="search-main searct-lists">

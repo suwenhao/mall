@@ -1,0 +1,112 @@
+.comments-page{
+    .comments-main{
+        .info-wrap{
+            padding:10px 0;
+            background-color: #fff;
+            .info-header{
+                padding-top:5px;
+                padding-bottom:15px;
+                border-bottom:1px solid #eee;
+                margin-bottom:15px;
+            }
+            .comment{
+                display: flex;
+                justify-content: space-between;
+                span{
+                    img{
+                        width:18px;
+                        height:18px;
+                        display: block;
+                    }
+                }
+            }
+            .info-body{
+                .info-body-top{
+                    display: flex;
+                    justify-content: space-between;
+                    .body-top-item{
+                        flex:1;
+                        font-size:10px;
+                        display: flex;
+                        justify-content:center;
+                        .am-checkbox{
+                            margin-right:5px;
+                            width:18px;
+                            height:18px;
+                        }
+                        .am-checkbox-inner{
+                            width:18px;
+                            height:18px;
+                        }
+                        .am-checkbox-inner:after{
+                            top:0;
+                        }
+                    }
+                }
+                .info-body-content{
+                    padding:10px 0 0 0;
+                    .li-item{
+                        border-top:1px solid #eee;
+                        padding-top:10px;
+                        margin:0 10px;
+                        .comment-top{
+                            display: flex;
+                            justify-content: space-between;
+                            label{
+                                width:60px;
+                                img{
+                                    width:50px;
+                                    height:50px;
+                                    border-radius: 50px;
+                                    display: block;
+                                }
+                            }
+                            .comment-content{
+                                flex:1;
+                                margin-left:10px;
+                                min-height:60px;
+                                .comment-name{
+                                    display: flex;
+                                    justify-content: space-between;
+                                    span:last-child{
+                                        font-size: 12px;
+                                        color:#555;
+                                    }
+                                }
+                                .comment-date{
+                                    color:#555;
+                                    font-size:12px;
+                                    display: flex;
+                                    justify-content: space-between;
+                                    span{
+                                        color:#555;
+                                    }
+                                }
+                                p{
+                                    margin:0;
+                                    margin-top:10px;
+                                    padding:0;
+                                } 
+                            }
+                        }
+                        .comment-img{
+                            padding-top:10px;
+                            margin-top:10px;
+                            overflow: hidden;
+                            .img{
+                                margin-left:10px;
+                                margin-bottom:10px;
+                                background-color: #222;
+                                background-position: center;
+                                background-repeat: no-repeat;
+                                height:80px;
+                                width:80px;
+                                float:left;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

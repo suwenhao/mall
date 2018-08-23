@@ -14,6 +14,7 @@ import Cate from '@/pages/Cate'
 import My from '@/pages/My'
 import Cart from '@/pages/Cart'
 import GoodsDetail from '@/pages/GoodsDetail';
+import Comments from '@/pages/Comments';
 import Order from '@/pages/Order';
 import Search from '@/pages/Search';
 import Searchlist from '@/pages/Searchlist';
@@ -52,6 +53,7 @@ class Index extends Component {
                         <Route exact path="/cate" component={Cate}></Route>
                         <Route  path="/cate" component={Cate}></Route>
                         <Route path="/goods/:id" component={GoodsDetail}></Route>
+                        <Route path="/comments/:id" component={Comments}></Route>
                         <Route path="/order" component={Order}></Route>
                         <Route exact path="/search" component={Search}></Route>
                         <Route exact path="/searchlist/:s" component={Searchlist}></Route>

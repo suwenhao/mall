@@ -52,8 +52,28 @@ class Orderlist extends Component {
       }
       let {data} = await axios.get(baseUrl+'/order/list',{params}).then(res=>res)
       console.log(data)
+      let list = data.data.data;
+      //获取物流信息
+      list.forEach((item,i)=>{
+        if(item.trackingno){
+          $.ajax({
+            type:'post',
+            data:{
+                token:getToken(),
+                com:item.expressCode,
+                num:item.trackingno
+            },
+            async:false,
+            url:baseUrl+'/order/query',
+            success(res){
+                let taeckArr=JSON.parse(res.data.result).data;
+                item.trackingTxt = taeckArr?taeckArr[0].context.substring(0,6):'查询无结果'
+            }
+          })
+        }
+      })
       this.setState({
-        list:data.data.data,
+        list:list,
         loading:false,
         pageNumber:this.state.pageNumber+1,
         pageSize:10,
@@ -156,8 +176,27 @@ class Orderlist extends Component {
           status:this.state.status
         }
         let {data} = await axios.get(baseUrl+'/order/list',{params}).then(res=>res)
-        console.log(data)
-        let newData=this.state.list.concat(data.data.data)
+        let list = data.data.data;
+        //获取物流信息
+        list.forEach((item,i)=>{
+          if(item.trackingno){
+            $.ajax({
+              type:'post',
+              data:{
+                  token:getToken(),
+                  com:item.expressCode,
+                  num:item.trackingno
+              },
+              async:false,
+              url:baseUrl+'/order/query',
+              success(res){
+                  let taeckArr=JSON.parse(res.data.result).data;
+                  item.trackingTxt = taeckArr?taeckArr[0].context.substring(0,6):'查询无结果'
+              }
+            })
+          }
+        })
+        let newData=this.state.list.concat(list)
         this.setState({
           list:newData,
           loading:false,
@@ -205,7 +244,8 @@ class Orderlist extends Component {
                             function(res){     
                                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                     Toast.info("支付成功",1);
-                                    that.props.history.push('/my/orderlist')
+                                    that.getOrderList()
+                                    window.location.reload()
                                 }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
                             }
                         );
@@ -219,7 +259,7 @@ class Orderlist extends Component {
   }
   //删除按钮
   deleteBtns(item){
-    if(item.orderStatus===4||item.orderStatus===3){
+    if(item.orderStatus===4||item.orderStatus===7){
       return [{
         text: '删除',
         onPress: () =>{
@@ -272,7 +312,21 @@ class Orderlist extends Component {
   //立即评论
   gotoComment(item) {
     var that = this;
-    that.props.history.push('/my/orderComment/'+item.id)
+    console.log(item)
+    that.props.history.push('/my/ordercomment/'+item.orderId)
+  }
+  //跳转到物流
+  gotoTrack(item){
+    console.log(item)
+    if(item.trackingno){
+      this.props.history.push('/my/logistics');
+      sessionStorage.setItem('__logistics__',JSON.stringify({
+        com:item.expressCode,
+        num:item.trackingno,
+        orderId:item.orderId,
+        name:item.expressName
+      }))
+    }
   }
   //挂载组件
   componentDidMount(){
@@ -320,7 +374,7 @@ class Orderlist extends Component {
               swipeable={false}
               renderTab={tab => <span>{tab.title}</span>}
               onChange={(tab, index) => {
-                sessionStorage.setItem('__session_order__',index)
+                sessionStorage.setItem('__session_order__',tab.sub)
                 this.changeStatus(tab,index)
               }}
             >
@@ -367,6 +421,12 @@ class Orderlist extends Component {
                             <span className="label">订单号：</span>
                             {item.orderId} 
                           </div>
+                          <div className="order-id" onClick={()=>{
+                              this.gotoTrack(item)
+                            }}>
+                            <span className="label">物&nbsp;&nbsp;&nbsp;&nbsp;流：</span>
+                            {item.trackingno?item.trackingTxt:'暂无物流信息'} 
+                          </div>
                           <div className="order-state">
                             <div className="o-left">
                               <div className="state">
@@ -381,7 +441,9 @@ class Orderlist extends Component {
                             <div className="o-right">
                               {
                                 item.orderStatus===1||item.orderStatus===0?
-                                  <button onClick={()=>{
+                                  <button style={{
+                                    background: '#f19325'
+                                  }} onClick={()=>{
                                     this.payment(item)
                                   }}>支付</button>
                                 :
@@ -403,7 +465,9 @@ class Orderlist extends Component {
                               }
                               {
                                 item.orderStatus===6?
-                                  <button onClick={()=>{
+                                  <button style={{
+                                    background: '#3884ff'
+                                  }} onClick={()=>{
                                     this.gotoComment(item)
                                   }}>评价</button>
                                 :

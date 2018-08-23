@@ -27,7 +27,10 @@ class Commodity extends Component {
                                 this.gotoList(item.id)
                             }}>
                                 <div className="head">
-                                    <img className="item-img" src={item.thumbnail} alt=""/>
+                                    <img className="item-img" src={item.thumbnail} alt="" onLoad={(e)=>{
+                                        let dom=e.currentTarget;
+                                        dom.height=dom.width;
+                                    }}/>
                                 </div>
                                 <div className="body">
                                     <p>{item.name}</p>
