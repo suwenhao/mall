@@ -16,8 +16,8 @@ export const getToken = ()=>{
   var token = localStorage.getItem('token')
   if (!token) {
       // return '3517dcab16b368c11e12f70369b50185RR20A85m3b7TZyoU0w78330NO69o3oR2De1770Sg5a98l2U9q13c8Mk6V11o25z6'
-      return '3517dcab16b368c11e12f70369b50185g99yX3n36e80M0t99u1Ybw00M6286O605yn2JbM81u06i6439iDD87NS083751L1'
-      // return null
+      // return '3517dcab16b368c11e12f70369b50185g99yX3n36e80M0t99u1Ybw00M6286O605yn2JbM81u06i6439iDD87NS083751L1'
+      return null
   } else {
     return token
   }
