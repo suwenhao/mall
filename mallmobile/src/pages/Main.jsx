@@ -128,13 +128,16 @@ class Main extends Component {
         return (
             <div className="main-box" style={{height:'100%'}}>
                 <div className="header">
-                    <WingBlank>
+                    <span className="search-box">
                         <SearchBar placeholder="搜索" onFocus={()=>{
                             sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
                             this.props.history.push('/search')
                             this.props.router.changePath('/search')
                         }}/>
-                    </WingBlank>
+                    </span>
+                    <span className="msg">
+                        <img src={require(`@common/images/index-msg.png`)} alt=""/>
+                    </span>
                 </div>
                 <div className="body">
                     {/*轮播图*/}

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import * as routerAction from '@actions/routerAction'
+import * as loadAction from '@actions/loadAction'
 import {Route,Switch,Redirect} from 'react-router-dom'
 import {getToken, locationHref} from '@common/js/util'
 
@@ -29,8 +30,12 @@ class Index extends Component {
             window.location.href = locationHref()
         }
     }
+    getCartNum(){
+        this.props.load.getCartList()
+    }
     render(){
         this.authRoute()
+        this.getCartNum()
         let pathTF = false;
         this.props.paths.forEach(v=>{
             if(this.props.pathname===null&&(this.props.location.pathname===v)){
@@ -78,12 +83,13 @@ export default connect(
     ({routerReducer})=>{
         return {
             paths:routerReducer.paths,
-            pathname:routerReducer.path
+            pathname:routerReducer.path,
         }
     },
     (dispatch)=>{
         return {
-            router:bindActionCreators(routerAction,dispatch)
+            router:bindActionCreators(routerAction,dispatch),
+            load:bindActionCreators(loadAction,dispatch)
         }
     }
 )(Index)

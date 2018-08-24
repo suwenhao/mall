@@ -1,4 +1,7 @@
 import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
+import * as loadAction from '@actions/loadAction'
 import {withRouter} from 'react-router-dom'
 import {Checkbox, Stepper, SwipeAction, Toast, Modal} from 'antd-mobile'
 import {baseUrl,imgUrl,getToken} from '@common/js/util'
@@ -21,6 +24,7 @@ class CratItem extends Component{
     }
     //修改购物车
     editCart(it,val){
+        let that = this
         let params = {};
         params.items=[]
         params.items.push({
@@ -39,6 +43,7 @@ class CratItem extends Component{
             success(res){
                 if(res.code==0){
                     Toast.info('修改成功',1)
+                    that.props.load.getCartList()
                 }
             },
             error(err){
@@ -62,6 +67,7 @@ class CratItem extends Component{
                     success(res){
                         Toast.info("删除成功",1);
                         that.props.getCartList()
+                        that.props.load.getCartList()
                     },
                     error(err){
                         Toast.info('删除失败',1)
@@ -144,4 +150,11 @@ class CratItem extends Component{
         )
     }
 }
-export default withRouter(CratItem)
+export default connect(
+    null,
+    (dispatch)=>{
+        return {
+            load:bindActionCreators(loadAction,dispatch)
+        }
+    }
+)(withRouter(CratItem))

@@ -41,6 +41,7 @@ class GoodsDetail extends Component {
       specNameArr:null,
       spcount:null,
       allBtn:true,
+      cartListNum:[],
       style:{
         height:'auto',
         width:'auto'
@@ -95,6 +96,27 @@ class GoodsDetail extends Component {
         picobjs
       }
     })
+  }
+  //获取购物车列表
+  getCartList(){
+      let that = this
+      $.ajax({
+          type:'get',
+          data:{
+              token:getToken()
+          },
+          url:baseUrl+'/cart/getCart',
+          success(res){
+              console.log(res)
+              let cartListNum=0;
+              res.data.data.forEach(item => {
+                cartListNum+=item.quantity
+              });
+              that.setState({
+                cartListNum:cartListNum
+              })
+          }
+      })
   }
   //获取商品信息详情
   getGoodsDetail(){
@@ -161,6 +183,7 @@ class GoodsDetail extends Component {
         })
         //构建规格
         that.filterData(data)
+        that.getCartList()
       },
       error(){
         that.setState({
@@ -384,6 +407,7 @@ class GoodsDetail extends Component {
               dataType:'json',
               success(res){
                   Toast.info('加入购物车成功',1)
+                  that.getCartList()
               },
               error(err){
                   Toast.info('加入购物车失败',1)
@@ -459,12 +483,22 @@ class GoodsDetail extends Component {
         <Header returnbtn={true} title="商品详情" pathname={goodsPrevPath||'/'}></Header>
         {/* 头部-> */}
         {/* <-body */}
-        <div className="cart-icon" onClick={()=>{
-          sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
-          this.props.history.push('/cart')
-        }}>
-          <img src={require(`@common/images/cart_w.png`)} alt=""/>
-        </div> 
+        {
+        this.state.loading?
+        null
+        :
+          <div className="cart-icon" onClick={()=>{
+            sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+            this.props.history.push('/cart')
+          }}>
+            {
+              this.state.cartListNum>0?
+              <span>{this.state.cartListNum}</span>
+              :null
+            }
+            <img src={require(`@common/images/cart_w.png`)} alt=""/>
+          </div>
+        }
         {
         this.state.loading?
         <Loading/>

@@ -112,7 +112,7 @@ class Address extends Component {
                                     ]}
                                 >
                                     <div className="address-item" onClick={()=>{
-                                        if(prevPath==='/my'){
+                                        if(prevPath==='/my'||prevPath==='/my/address'||prevPath==='/my/addressadd'||prevPath==='/my/addressedit'){
 
                                         }else{
                                             this.props.history.push({

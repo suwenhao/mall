@@ -25,16 +25,16 @@
         .buy-wrap{
             padding: 15px 10px;
             overflow: hidden;
-            padding-top: 12px;
-            padding-bottom: 10px;
+            padding-top: 10px;
+            padding-bottom: 0px;
             position: relative;
-            min-height: 36px;
+            // min-height: 36px;
             background-color: #fff;
             .goods-name{
-                padding-right: 52px;
+                // padding-right: 52px;
                 display: flex;
                 align-items: center;
-                min-height: 36px;
+                // min-height: 36px;
                 .goods-title{
                     font-size: 16px;
                     color: #333;
@@ -84,6 +84,7 @@
                 font-size: 12px;
                 max-height: 46px;
                 overflow: hidden;
+                display:none;
             }
         }
         .price-wrap{
@@ -354,19 +355,30 @@
         }
     }
     .cart-icon{
-        width:50px;
-        height:50px;
+        width:40px;
+        height:40px;
         background-color: rgba(0,0,0,.5);
-        border-radius: 50px;
+        border-radius: 40px;
         position: fixed;
         top: 60px;
         right: 10px;
         z-index: 100;
+
         img{
             width:60%;
             height:60%;
             margin:20% auto;
             display: block;
+        }
+        span{
+            position: absolute;
+            background-color: rgba(0,0,0,.9);
+            color:#fff;
+            padding: 2px 7px;
+            border-radius: 70px;
+            top: -5px;
+            right: -5px;
+            font-size:10px;
         }
     }
 }

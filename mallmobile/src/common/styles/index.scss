@@ -8,6 +8,21 @@
         margin-bottom: 50px;
         .header{
             background-color: #efeff4;
+            display: flex;
+            .search-box{
+                flex:1;
+            }
+            .msg{
+                width:40px;
+                display: block;
+                line-height: 45px;
+                img{
+                    width:20px;
+                    display: block;
+                    height:31px;
+                    padding:5px 10px;
+                }
+            }
         }
         .body{
             .advertising{

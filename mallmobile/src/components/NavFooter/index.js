@@ -71,6 +71,7 @@ class NavFooter extends Component {
                     this.state.tabbars.map((v,i)=>{
                         return (
                             <TabBar.Item
+                                badge={v.key==='cart'&&this.props.cartNum>0?this.props.cartNum:null}
                                 key={i}
                                 title={v.title}
                                 icon={
@@ -88,7 +89,8 @@ class NavFooter extends Component {
                                     this.props.router.changePath('/'+v.key)
                                     sessionStorage.setItem('__search_prev_path__','/'+v.key)
                                 }}
-                            />
+                            >
+                            </TabBar.Item>
                         )
                     })
                 }
@@ -97,9 +99,10 @@ class NavFooter extends Component {
     }
 }
 export default connect(
-    ({routerReducer})=>{
+    ({routerReducer,loadReducer})=>{
         return{
-            path:routerReducer.path
+            path:routerReducer.path,
+            cartNum:loadReducer.cartNum
         }
     },
     (dispatch)=>{
