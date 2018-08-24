@@ -232,6 +232,7 @@ class OrderComment extends Component {
             order
         })
     }
+    //关闭图片浏览
     handleClose(index){
         let order=this.state.order;
         order[index].isOpen=false;
@@ -239,6 +240,7 @@ class OrderComment extends Component {
             order
         })
     }
+    //提交
     submit(){
         let that=this
         var flag=false;
@@ -259,7 +261,7 @@ class OrderComment extends Component {
                 contentItem.productId = this.state.order[i].productId;
                 contentItem.skuId = this.state.order[i].skuId;
                 contentItem.starLevel = this.state.order[i].eval===1?5:this.state.order[i].eval===2?4:2;
-                contentItem.memo = this.state.order[i].memo || '';
+                contentItem.memo = this.state.order[i].content || '';
                 contentItem.fileList = this.state.order[i].images.map(v=>{
                     return v.src;
                 });
@@ -279,13 +281,13 @@ class OrderComment extends Component {
                     console.log(res)
                     if(res.code == 0){
                         Toast.info('提交成功',1);
-                        that.setState({
-                            ds:false
-                        })
-                        //that.props.history.push('/my/orderlist')
+                        that.props.history.push('/my/orderlist')
                     }else if(res.code==2){
                         Toast.info(res.message,1);
                     }
+                    that.setState({
+                        ds:false
+                    })
                 }
             })
         }

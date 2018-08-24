@@ -1,36 +1,42 @@
 import React, { Component } from 'react'
-import {connect} from 'react-redux'
+//头部
 import Header from '@components/Header/Header'
-import {Carousel,Stepper,Toast, Checkbox} from 'antd-mobile'
+//组件
+import {Carousel,Stepper,Toast} from 'antd-mobile'
+//页面css
 import '@common/styles/goodsdetail.scss'
-import 'react-photoswipe/lib/photoswipe.css'
+//图片预览器组件
 import {PhotoSwipe} from 'react-photoswipe'
-import {unique,baseUrl,imgUrl,getToken,computingTime,formatTime} from '@common/js/util.js'
+//公共功能
+import {unique,baseUrl,imgUrl,getToken} from '@common/js/util.js'
+//加载中组件
 import Loading from '@base/Loading'
+//classnames插件
 import classnames from 'classnames'
-import axios from 'axios'
+//jquery
 import $ from 'jquery'
+//评论组件
+import Comments from '@components/GoodsDetail/Comments'
 
 class GoodsDetail extends Component {
+  //构造函数
   constructor(props){
     super(props);
     this.state = {
-      loading:true,
-      data: null,
-      loading1:false,
-      val: 1,
-      sku:null,
-      token:null,
-      goodId:props.match.params.id,
-      stockNum:null,
-      stockId:null,
-      popPrice:null,
-      standard:null,
-      productName:null,
-      productImage:null,
-      productPrice:null,
-      introduction:"",
-      specCount:null,
+      loading:true, //控制加载中显示
+      data: null,   //商品数据
+      val: 1,       //商品数量
+      sku:null,     //sku 
+      goodId:props.match.params.id,  //商品id
+      stockNum:null,    //库存
+      stockId:null,     //库存id
+      popPrice:null,    //商品当前规格价格
+      standard:null,    //sku文字
+      productName:null,  //商品名称
+      productImage:null, //商品图片
+      productPrice:null, //商品价格
+      introduction:"",   //商品详情
+      specCount:null,   
       specData:null,
       specNameArr:null,
       spcount:null,
@@ -43,15 +49,15 @@ class GoodsDetail extends Component {
         width:'5px',
         height:'5px'
       },
-      isOpen:false,
+      isOpen:false,  //图片预览开关
+      //图片预览设置
       options:{
         index: 0,
         escKey: true,
         shareEl: false,
+        history:false,
         shareButtons:[]
       },
-      commentIndex:1,
-      comments:[]
     }
   }
   //计算窗口宽高
@@ -80,11 +86,9 @@ class GoodsDetail extends Component {
   }
   //计算图片宽高
   calcImg(ev,i){
-    let picobjs=this.state.data.picobjs.concat()
-    let item=picobjs[i];
-    item.w=ev.currentTarget.width;
-    item.h=ev.currentTarget.height;
-    picobjs[i]=item;
+    let picobjs=this.state.data.picobjs.concat();
+    picobjs[i].w=ev.currentTarget.width
+    picobjs[i].h=ev.currentTarget.height
     this.setState({
       data:{
         ...this.state.data,
@@ -94,59 +98,76 @@ class GoodsDetail extends Component {
   }
   //获取商品信息详情
   getGoodsDetail(){
-    (async ()=>{
-      let goodId = this.props.match.params.id
-      console.log(goodId)
-      let params = {
-        goodId
+    let that = this
+    let params = {
+      goodId:this.state.goodId
+    }
+    $.ajax({
+      type:'get',
+      data:params,
+      url:baseUrl+'/goodDetail',
+      success(res){
+        // console.log(res.data.data)
+        that.setState({
+          introduction:res.data.data.introduction
+        })
+      },
+      error(){
+        that.setState({
+          loading:false
+        })
       }
-      let res = await axios.get(baseUrl+'/goodDetail',{params}).then(res=>res);
-      let {data} = res.data
-      console.log(data)
-      //introduction
-      this.setState({
-        introduction:data.data.introduction
-      })
-    })()
+    })
   }
   //获取商品信息
   getGoodsInfo(){
-    (async ()=>{
-      let goodId = this.props.match.params.id
-      console.log(goodId)
-      let params = {
-        goodId,
-        token:getToken()
-      }
-      let res = await axios.get(baseUrl+'/goodsInfo',{params}).then(res=>res);
-      let {data} = res.data
-      console.log(data)
-      data.productImage = imgUrl+ data.productImage; 
-      let pictures = []
-      //渲染数据
-      if (data.pictures) {
-          pictures = data.pictures.split(',')
-          for (var i in pictures) {
-              pictures[i] = imgUrl + pictures[i]
-          }
-          pictures.unshift(data.productImage)
-      }
-      if (pictures.length < 1) {
-          pictures.push(data.productImage)
-      }
-      let picobj=pictures.map(v=>{
-        return {
-          src:v
+    let that = this
+    let params = {
+      goodId:this.state.goodId,
+      token:getToken()
+    }
+    $.ajax({
+      type:'get',
+      data:params,
+      url:baseUrl+'/goodsInfo',
+      success(res){
+        let data = res.data
+        data.productImage = imgUrl+ data.productImage; 
+        //组合图片数组
+        let pictures = []
+        //有详细图片时
+        if (data.pictures) {
+            pictures = data.pictures.split(',')
+            for (var i in pictures) {
+                pictures[i] = imgUrl + pictures[i]
+            }
+            pictures.unshift(data.productImage)
         }
-      })
-      data.picobjs=picobj
-      this.setState({
-        data,
-        loading:false
-      })
-      this.filterData(data)
-      this.requestComment(1);
-    })()
+        //没有详细图片时放入封面图片
+        if (pictures.length < 1) {
+            pictures.push(data.productImage)
+        }
+        //构建图片预览器需要的数据
+        let picobjs=pictures.map(v=>{
+          return {
+            src:v,w:500,h:500
+          }
+        })
+        data.picobjs=picobjs
+        //更新model
+        that.setState({
+          data,
+          loading:false
+        })
+        //构建规格
+        that.filterData(data)
+      },
+      error(){
+        that.setState({
+          loading:false
+        })
+      }
+    })
   }
   //设置初始
   setAllDataStandard(sku){
@@ -375,7 +396,7 @@ class GoodsDetail extends Component {
     }
   }
   //购买
-  buyImmediately(val){
+  buyImmediately(){
     //点击立刻购买
     var that = this;
     var allBtn = that.state.allBtn;
@@ -388,7 +409,9 @@ class GoodsDetail extends Component {
         if (that.state.val > that.state.stockNum) {
           Toast.info('库存不足',1);
         } else {
-          //现在的思路是每次点击规格的时候就把规格参数记录起来，然后再点击立即购买的时候拿出数据，转跳界面的时候需要清除数据
+          //现在的思路是每次点击规格的时候就把规格参数记录起来，
+          //然后再点击立即购买的时候拿出数据，
+          //转跳界面的时候需要清除数据
           var allData = {};
           allData['items']=[]
           allData['items'].push({
@@ -411,99 +434,6 @@ class GoodsDetail extends Component {
         Toast.info('请选择规格',1);
       }
     }
-  }
-  //评论切换
-  checkComment (i) {
-    this.setState({
-      tab:i,
-      loading1:true,
-      comments:[]
-    },()=>{
-      this.requestComment(i)
-    })
-  }
-  //跳转到评论页
-  gotoComment(){
-    this.props.history.push('/comments/'+this.state.goodId)
-  }
-  //图片宽高
-  imgLoad(e,index,j){
-    let comments=this.state.comments;
-    let productCommentImgs=comments[index].productCommentImgs.concat()
-    productCommentImgs[j].w=e.currentTarget.width;
-    productCommentImgs[j].h=e.currentTarget.height;
-    comments[index].productCommentImgs=productCommentImgs;
-    this.setState({
-      comments
-    })
-  }
-  //关闭图片预览
-  handleClose1(index){
-      let comments=this.state.comments;
-      comments[index].isOpen=false;
-      this.setState({
-        comments
-      })
-  }
-  //获取评论
-  requestComment(i){
-    let that=this;
-    let params = {
-        productId: this.state.goodId,
-        commentType: i,
-        pageSize: 2,
-        pageNumber: 1
-    };
-    try {
-        $.ajax({
-            type:"post",
-            url:baseUrl+'/getCommentPage',//添加自己的接口链接
-            timeOut:5000,
-            data:params,
-            dataType:'json',
-            success(res){
-                console.log(res)
-                let comments = res.data.data
-                if (comments.length < 1) {
-                    that.setState({
-                      comments:[],
-                      loading1:false
-                    })
-                } else {
-                    for (let i = 0; i < comments.length; i++) {
-                        //计算评论时间距离
-                        comments[i].productCommentImgs=comments[i].productCommentImgs.map(v=>{
-                          return {
-                            ...v,
-                            w:500,
-                            h:500,
-                            src:v.imgUrl
-                          }
-                        })
-                        comments[i].isOpen=false;
-                        comments[i].options={
-                            index: 0,
-                            escKey: true,
-                            shareEl: false,
-                            shareButtons:[]
-                        }
-                        comments[i].distanceTime = computingTime(comments[i].commentTime);
-                        //处理评论日期
-                        comments[i].commentTime = formatTime(new Date(comments[i].commentTime));
-                    }
-                    that.setState({
-                      comments,
-                      loading1:false
-                    })
-                }
-            },
-            error(){
-                Toast.info('请求出错',1)
-            }
-        })
-    } catch (error) {
-        console.log('客户端404，没有这个接口')
-    }  
   }
   //组件装载完毕
   componentDidMount(){
@@ -673,125 +603,11 @@ class GoodsDetail extends Component {
               <span>
                 评论
               </span>
-              <span>
+              {/* <span>
                 <img src={require('@common/images/next.png')} alt=""/>
-              </span>
+              </span> */}
             </div>
-            <div className="info-body">
-                <div className="info-body-top">
-                    <div className="body-top-item">
-                      <Checkbox checked={this.state.commentIndex===1?true:false} onChange={()=>{
-                        this.setState({commentIndex:1},()=>{
-                          this.checkComment(1)
-                        })
-                      }}/>
-                      <span>好评({this.state.data&&this.state.data.commentTotal.goodNum})</span>
-                    </div>
-                    <div className="body-top-item">
-                      <Checkbox checked={this.state.commentIndex===2?true:false} onChange={()=>{
-                        this.setState({commentIndex:2},()=>{
-                          this.checkComment(2)
-                        })
-                      }}/>
-                      <span>中评({this.state.data&&this.state.data.commentTotal.mediumNum})</span>
-                    </div>
-                    <div className="body-top-item">
-                      <Checkbox checked={this.state.commentIndex===3?true:false} onChange={()=>{
-                        this.setState({commentIndex:3},()=>{
-                          this.checkComment(3)
-                        })
-                      }}/>
-                      <span>差评({this.state.data&&this.state.data.commentTotal.badNum})</span>
-                    </div>
-                    <div className="body-top-item">
-                      <Checkbox checked={this.state.commentIndex===4?true:false} onChange={()=>{
-                        this.setState({commentIndex:4},()=>{
-                          this.checkComment(4)
-                        })
-                      }}/>
-                      <span>有图({this.state.data&&this.state.data.commentTotal.imgNum})</span>
-                    </div>
-                </div>
-                <div className="info-body-content">
-                    <ul>
-                      {
-                        this.state.loading1?
-                        <Loading/>
-                        :null
-                      }
-                      {
-                        this.state.comments.length>0?
-                        this.state.comments.map((item,i)=>{
-                          return (
-                            <li key={i}>
-                              <div className="comment-top">
-                                <label>
-                                  <img src={item.fansHeadImg} alt=""/>
-                                </label>
-                                <span className="comment-content">
-                                  <div className="comment-name">
-                                    <span>{item.fansName}</span>
-                                    <span>{item.commentTime}</span>
-                                  </div>
-                                  <div className="comment-date">
-                                    <span>{item.distanceTime}</span>
-                                    <span>{item.skuValue}</span>
-                                  </div>
-                                  <p>不错不错</p>
-                                </span>
-                              </div>
-                              <div className="comment-img">
-                                {
-                                  item.productCommentImgs.map((jtem,j)=>{
-                                    return(
-                                      <div key={j} style={{
-                                        backgroundImage:`url(${jtem.imgUrl}`,
-                                        backgroundSize:jtem.w>=jtem.h?'100% auto':'auto 100%',
-                                      }} onClick={()=>{
-                                          let comments = this.state.comments.concat();
-                                          comments[i].isOpen=true;
-                                          comments[i].options={
-                                              ...comments[i].options,
-                                              index:j
-                                          };
-                                          this.setState({
-                                            comments
-                                          })
-                                      }} className="img">
-                                        <img src={jtem.imgUrl} style={{
-                                              display:'none'
-                                          }} onLoad={(e)=>{
-                                              this.imgLoad(e,i,j)
-                                          }} alt=""/>
-                                      </div>
-                                    )
-                                  })
-                                }    
-                              </div>
-                              {
-                                  item.isOpen?
-                                  <PhotoSwipe isOpen={item.isOpen} items={item.productCommentImgs} options={item.options} onClose={()=>{
-                                      this.handleClose1(i)
-                                  }}/>
-                                  :null
-                              }
-                            </li>
-                          )
-                        })
-                        :<li className="order-tip">暂无评论</li>
-                      }
-                    </ul>
-                    {
-                        this.state.comments.length>0?
-                        <div style={{
-                          borderTop:'1px solid #eee'
-                        }} className="order-tip" onClick={()=>{
-                          this.gotoComment()
-                        }}>查看更多</div>
-                        :null
-                    }
-                </div>
-            </div>
+            <Comments commentTotal={this.state.data&&this.state.data.commentTotal} goodId={parseInt(this.state.goodId)}/>
           </div>
           <div className="info-wrap">
             <div className="info-header">商品详情</div>
@@ -817,4 +633,4 @@ class GoodsDetail extends Component {
     )
   }
 }
-export default connect()(GoodsDetail)
+export default GoodsDetail

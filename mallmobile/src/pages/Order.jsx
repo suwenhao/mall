@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import { Button, Toast, Picker, List, TextareaItem } from 'antd-mobile'
+import { Button, Toast, Picker, List, TextareaItem, Modal } from 'antd-mobile'
 import TextHeader from '@components/Header/TextHeader'
 import _ from 'underscore'
 import $ from 'jquery'
@@ -17,6 +17,7 @@ class Order extends Component {
         loading:true,
         orderInfo:null,
         addressList:[],
+        orderId:null,
         addr:null,
         memo:'',
         presetArr:[
@@ -159,19 +160,6 @@ class Order extends Component {
         receiverId:that.state.addr.id,
         memo:this.state.memo
       }
-      // var params={
-      //     token:getToken(),
-      //     agentCode:'',
-      //     productId:cart['goods'][0]['productId'],
-      //     skuId:cart['goods'][0]['skuId'],
-      //     quantity:cart['goods'][0]['quantity'],
-      //     payMethod:'1',
-      //     receiverId:that.state.addr.id,
-      //     pickupWay:cart['pickupWay'],
-      //     deliveryDate:'',
-      //     memo:this.state.memo
-      // }
-      console.log(params)
       $.ajax({
           type:'post',
           data:params,
@@ -181,7 +169,9 @@ class Order extends Component {
               if(res.code == 0){
                   let orderId = res.data.orderId;
                   let orderMoney = that.state.orderInfo.totalPrice;
-                  that.state.orderId=orderId;
+                  that.setState({
+                    orderId
+                  })
                   that.payment(orderId,orderMoney);
               } else if(res.code == 2){
                   Toast.info(res.message,1);
@@ -255,7 +245,28 @@ class Order extends Component {
     let prevPath = sessionStorage.getItem('__search_prev_path__')
     return (
       <div className="orderDetail-page">
-        <TextHeader returnbtn={true} title="确认订单" pathname={prevPath||'/'}></TextHeader>
+        <TextHeader callback={(back)=>{
+          if(this.state.orderId){
+            Modal.alert('提示', '是否取消该订单？', [
+              { text: '取消', onPress: () => console.log('cancel'), style: 'default' },
+              { text: '确认', onPress: () => {
+                $.ajax({
+                    type:'post',
+                    data:{
+                        token:getToken(),
+                        orderId:this.state.orderId
+                    },
+                    url:baseUrl+'/order/delete',
+                    success(res){
+                      back()
+                    }
+                })
+              }},
+            ]);
+          }else{
+            back()
+          }
+        }} returnbtn={true} title="确认订单" pathname={prevPath||'/'}></TextHeader>
         {
           this.state.loading?
         <Loading/>

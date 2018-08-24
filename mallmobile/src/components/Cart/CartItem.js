@@ -81,6 +81,7 @@ class CratItem extends Component{
         let item = this.props.item
         return (
             <SwipeAction
+            autoClose={true}
             style={{ backgroundColor: '#f5f5f9',paddingBottom:'10px' }}
             right={[
                 {

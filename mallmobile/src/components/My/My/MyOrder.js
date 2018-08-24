@@ -68,8 +68,8 @@ class MyOrder extends Component {
                     this.gotoOrder(2)
                 }}>
                     {
-                        this.state.data.received>0?
-                        <i>{this.state.data.received}</i>
+                        this.state.data.shipped>0?
+                        <i>{this.state.data.shipped}</i>
                         :null
                     }
                     <img src={require('@common/images/wait.png')} alt=""/>
@@ -79,8 +79,8 @@ class MyOrder extends Component {
                     this.gotoOrder(3)
                 }}>
                     {
-                        this.state.data.shipped>0?
-                        <i>{this.state.data.shipped}</i>
+                        this.state.data.received>0?
+                        <i>{this.state.data.received}</i>
                         :null
                     }
                     <img src={require('@common/images/unrecieve.png')} alt=""/>

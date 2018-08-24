@@ -6,7 +6,7 @@ import Loading from '@base/Loading'
 import {PhotoSwipe} from 'react-photoswipe'
 import axios from 'axios'
 import $ from 'jquery'
-import {baseUrl,imgUrl,getToken,computingTime,formatTime} from '@common/js/util.js'
+import {baseUrl,getToken,computingTime,formatTime} from '@common/js/util.js'
 
 import '@common/styles/comments.scss'
 
@@ -18,14 +18,14 @@ class Comments extends Component {
             goodId:this.props.match.params.id,
             down:false,
             height:document.documentElement.clientHeight-95,
-            list:[],
+            comments:[],
             images:[],
             isOpen:false,
-            tab:1,
             options:{
                 index: 0,
                 escKey: true,
                 shareEl: false,
+                history:false,
                 shareButtons:[]
             },
             pageNumber:1,
@@ -47,31 +47,41 @@ class Comments extends Component {
     }
      //获取商品信息详情
      getGoodsInfo(){
-        (async ()=>{
-          let goodId = this.state.goodId
-          let params = {
-            goodId,
-            token:getToken()
-          }
-          let res = await axios.get(baseUrl+'/goodsInfo',{params}).then(res=>res);
-          let {data} = res.data
-          console.log(data)
-          this.setState({
-            data,
-            loading:false
-          })
-          this.requestComment();
-        })()
+        let that = this
+        let params = {
+        goodId:this.state.goodId,
+        token:getToken()
+        }
+        $.ajax({
+            type:'get',
+            data:params,
+            url:baseUrl+'/goodsInfo',
+            success(res){
+                let data = res.data
+                
+                //更新model
+                that.setState({
+                    data,
+                    loading:false
+                })
+                //获取评论
+                that.requestComment()
+            },
+            error(){
+                that.setState({
+                loading:false
+                })
+            }
+        })
     }
       //评论切换
     checkComment (i) {
         this.setState({
-            tab:i,
             pageNumber:1,
             pageSize:10,
             totalPage:1,
             loading:true,
-            list:[]
+            comments:[]
         },()=>{
             this.requestComment()
         })
@@ -81,7 +91,7 @@ class Comments extends Component {
         let that = this
         let params = {
             productId: this.state.goodId,
-            commentType: this.state.tab,
+            commentType: this.state.commentIndex,
             pageSize: this.state.pageSize,
             pageNumber: this.state.pageNumber
         }
@@ -91,35 +101,28 @@ class Comments extends Component {
             data:params,
             dataType:'json',
             success(res){
-                let list = res.data.data
-                for (let i = 0; i < list.length; i++) {
-                    //计算评论时间距离
-                    list[i].productCommentImgs=list[i].productCommentImgs.map(v=>{
-                      return {
-                        ...v,
-                        w:500,
-                        h:500,
-                        src:v.imgUrl
-                      }
+                let comments = res.data.data
+                comments.forEach((ctem,c)=>{
+                    //重整图片数据
+                    ctem.productCommentImgs=ctem.productCommentImgs.map(v=>{
+                        return {
+                          ...v,
+                          w:500,
+                          h:500,
+                          src:v.imgUrl
+                        }
                     })
-                    list[i].isOpen=false;
-                    list[i].options={
-                        index: 0,
-                        escKey: true,
-                        shareEl: false,
-                        shareButtons:[]
-                    }
-                    list[i].distanceTime = computingTime(list[i].commentTime);
+                    ctem.distanceTime = computingTime(ctem.commentTime);
                     //处理评论日期
-                    list[i].commentTime = formatTime(new Date(list[i].commentTime));
-                }
+                    ctem.commentTime = formatTime(new Date(ctem.commentTime));
+                })
                 that.setState({
-                    list:list,
+                    comments:comments,
                     totalPage:res.data.totalPages,
                     loading:false,
                     pageNumber:that.state.pageNumber+1,
                     pageSize:10,
-                    tip:list.length>0?false:true,
+                    tip:comments.length>0?false:true,
                 })
             },
             error(err){
@@ -137,7 +140,7 @@ class Comments extends Component {
         }else{
             let params = {
                 productId: this.state.goodId,
-                commentType: this.state.tab,
+                commentType: this.state.commentIndex,
                 pageSize: this.state.pageSize,
                 pageNumber: this.state.pageNumber
             }
@@ -147,37 +150,30 @@ class Comments extends Component {
                 data:params,
                 dataType:'json',
                 success(res){
-                    let list = res.data.data
-                    for (let i = 0; i < list.length; i++) {
-                        //计算评论时间距离
-                        list[i].productCommentImgs=list[i].productCommentImgs.map(v=>{
-                          return {
-                            ...v,
-                            w:500,
-                            h:500,
-                            src:v.imgUrl
-                          }
+                    let comments = res.data.data
+                    comments.forEach((ctem,c)=>{
+                        //重整图片数据
+                        ctem.productCommentImgs=ctem.productCommentImgs.map(v=>{
+                            return {
+                              ...v,
+                              w:500,
+                              h:500,
+                              src:v.imgUrl
+                            }
                         })
-                        list[i].isOpen=false;
-                        list[i].options={
-                            index: 0,
-                            escKey: true,
-                            shareEl: false,
-                            shareButtons:[]
-                        }
-                        list[i].distanceTime = computingTime(list[i].commentTime);
+                        ctem.distanceTime = computingTime(ctem.commentTime);
                         //处理评论日期
-                        list[i].commentTime = formatTime(new Date(list[i].commentTime));
-                    }
-                    let newData=that.state.list.concat(list)
+                        ctem.commentTime = formatTime(new Date(ctem.commentTime));
+                    })
+                    let newData=that.state.comments.concat(comments)
                     that.setState({
-                        list:newData,
+                        comments:newData,
                         totalPage:res.data.totalPages,
                         loading:false,
                         pageNumber:that.state.pageNumber+1,
                         pageSize:10,
                         tip:newData.length>0?false:true,
-                        refreshing: false 
+                        refreshing: false
                     })
                 },
                 error(err){
@@ -188,13 +184,13 @@ class Comments extends Component {
     }
     //图片宽高
     imgLoad(e,index,j){
-        let list=this.state.list;
-        let productCommentImgs=list[index].productCommentImgs.concat()
+        let comments=this.state.comments;
+        let productCommentImgs=comments[index].productCommentImgs.concat()
         productCommentImgs[j].w=e.currentTarget.width;
         productCommentImgs[j].h=e.currentTarget.height;
-        list[index].productCommentImgs=productCommentImgs;
+        comments[index].productCommentImgs=productCommentImgs;
         this.setState({
-            list
+            comments
         })
     }
     //关闭图片预览
@@ -203,13 +199,21 @@ class Comments extends Component {
             isOpen:false
         })
     }
+    //打开预览图片
+    openImgPrview(item,j){
+        this.setState({
+            isOpen:true,
+            options:{
+                ...this.state.options,
+                index:j
+            },
+            images:item.productCommentImgs
+        })
+    }
     //挂载组件
     componentDidMount(){
         this.getGoodsInfo()
         this.resize()
-    }
-    gh(){
-        $('.pswp').height($(window).height())
     }
     render() {
         return (
@@ -271,13 +275,11 @@ class Comments extends Component {
                                 }}
                             >
                             {
-                                this.state.loading?
-                                <Loading/>
-                                :null
+                                this.state.loading?<Loading/>:null
                             }
                             {
-                                this.state.list.length>0?
-                                this.state.list.map((item,i)=>{
+                                this.state.comments.length>0?
+                                this.state.comments.map((item,i)=>{
                                 return (
                                     <div className="li-item" key={i}>
                                         <div className="comment-top">
@@ -293,7 +295,7 @@ class Comments extends Component {
                                                     <span>{item.distanceTime}</span>
                                                     <span>{item.skuValue}</span>
                                                 </div>
-                                                <p>不错不错</p>
+                                                <p>{item.content}</p>
                                             </span>
                                         </div>
                                         <div className="comment-img">
@@ -304,21 +306,7 @@ class Comments extends Component {
                                                     backgroundImage:`url(${jtem.imgUrl}`,
                                                     backgroundSize:jtem.w>=jtem.h?'100% auto':'auto 100%',
                                                 }} onClick={()=>{
-                                                    let list = this.state.list.concat();
-                                                    list[i].isOpen=true;
-                                                    list[i].options={
-                                                        ...list[i].options,
-                                                        index:j
-                                                    };
-                                                    this.setState({
-                                                        list,
-                                                        isOpen:true,
-                                                        options:{
-                                                            ...this.state.options,
-                                                            index:j
-                                                        },
-                                                        images:item.productCommentImgs
-                                                    })
+                                                    this.openImgPrview(item,j)
                                                 }} className="img">
                                                     <img src={jtem.imgUrl} style={{
                                                         display:'none'

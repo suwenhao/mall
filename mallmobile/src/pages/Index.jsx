@@ -7,6 +7,7 @@ import {getToken, locationHref} from '@common/js/util'
 
 //css
 import '@common/styles/index.scss'
+import 'react-photoswipe/lib/photoswipe.css'
 //组件
 import NavFooter from '@/components/NavFooter'
 import Main from '@/pages/Main'

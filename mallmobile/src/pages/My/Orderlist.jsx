@@ -408,6 +408,7 @@ class Orderlist extends Component {
                       return (
                         <SwipeAction
                           key={i}
+                          autoClose={true}
                           style={{ backgroundColor: '#f5f5f9',paddingBottom:'10px' }}
                           right={this.deleteBtns(item)}
                           onOpen={() => console.log('global open')}
