@@ -1,0 +1,225 @@
+.community-page{
+    .integraldetail{
+        padding-right:10px;
+        font-size:14px;
+    }
+    .community-main{
+        background-color: #fff;
+        .community-item{
+            padding:0 10px;
+            border-bottom:10px solid #f3f3f3;
+            .community-header{
+                padding:10px 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height:40px;
+                color:#333;
+                .c-left{
+                    display: flex;
+                    align-items: center;
+                    img{
+                        width:40px;
+                        height:40px;
+                        display:block;
+                        border-radius:40px;
+                    }
+                    span{
+                        margin-left:10px;
+                        display:block;
+                        font-size:16px;
+                    }
+                }
+                .c-right{
+                    font-size:10px;
+                    color:#888;
+                }
+            }
+            .community-body{
+                .desc{
+                    color:#333;
+                    overflow : hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    /* autoprefixer: off */
+                    -webkit-box-orient: vertical;
+                    /* autoprefixer: on */
+                    margin-bottom:10px;
+                }
+                .c-b-title{
+                    color:#333;
+                    overflow : hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    font-size:16px;
+                    -webkit-line-clamp: 1;
+                    /* autoprefixer: off */
+                    -webkit-box-orient: vertical;
+                    /* autoprefixer: on */
+                    margin-bottom:10px;
+                    margin-top:10px;
+                }
+                .ptext{
+                    color:#333;
+                    overflow : hidden;
+                    margin-bottom:10px;
+                }
+                .pictrues{
+                    .img-item{
+                        img{
+                            width:100%;
+                            border:1px solid #eee;
+                        }
+                    }
+                }
+            }
+            .community-footer{
+                display: flex;
+                justify-content: space-between;
+                .c-left{
+                    display: flex;
+                    align-items: center;
+                    .c-l-name{
+                        color:#333;
+                    }
+                    .c-l-time{
+                        margin-left:10px;
+                        color:#888;
+                        font-size:12px;
+                    }
+                }
+                .c-right{
+                    display: flex;
+                    color:#888;
+                    .c-icon{
+                        display: flex;
+                        align-items: center;
+                        margin-left:15px;
+                        padding:15px 0;
+                        height:18px;
+                        img{
+                            width:16px;
+                            height:16px;
+                            display: block;
+                        }
+                        span{
+                            height:16px;
+                            display: block;
+                            font-size:12px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+.community-detail{
+    background-color: #fff;
+    height: 100%;
+    .community-main{
+        .community-item{
+            border-bottom:0;
+            .c-footer{
+                margin-top:20px;
+                border-top:1px solid #eee;
+                .all-comments{
+                    padding:10px 0;
+                    font-size:16px;
+                    border-bottom:1px solid #eee;
+                    color:#333;
+                    span{
+                        font-size:12px;
+                    }
+                }
+                .comments-box{
+                    margin-bottom:20px;
+                    .comments-item{
+                        border-bottom:1px solid #eee;
+                        display: flex;
+                        padding-top:10px;
+                        justify-content: space-between;
+                        .left-avatar{
+                            width:40px;
+                            img{
+                                width:40px;
+                                height:40px;
+                                display: block;
+                                border-radius: 40px;
+                            }
+                        }
+                        .right-msg{
+                            flex:1;
+                            margin-left:10px;
+                            .r-m-t{
+                                display: flex;
+                                justify-content:space-between;
+                                .nickname{
+                                    color:#333;
+                                }
+                                .time{
+                                    color:#888;
+                                    font-size:12px;
+                                }
+                            }
+                            p{
+                                color:#555;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .community-page-footer{
+        position: fixed;
+        border-top:1px solid #eee;
+        height:45px;
+        bottom:0;
+        left:0;
+        background-color: #fff;
+        width:100%;
+        display: flex;
+        justify-content: space-between;
+        .cf-icon{
+            padding-left:10px;
+            display: flex;
+            align-items: center;
+            img{
+                width:30px;
+                height:30px;
+                display: block;
+                margin-top:-3px;
+            }
+            span{
+                height:14px;
+                margin-top:5px;
+                color:#555;
+                font-size:12px;
+            }
+        }
+        .input{
+            flex:1;
+            padding:8px;
+            height:29px;
+            input{
+                height:29px;
+                width:100%;
+                display: block;
+                text-indent: 15px;
+                line-height: 29px;
+                margin:0;
+                padding:0;
+                background-color:#f3f3f3;
+                border-radius: 29px;
+                border:0;
+            }
+        }
+        .btn{
+            width:60px;
+            text-align: center;
+            color:#eb3c3c;
+            line-height: 45px;
+        }
+    }
+}

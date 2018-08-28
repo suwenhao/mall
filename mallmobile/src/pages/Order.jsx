@@ -183,6 +183,20 @@ class Order extends Component {
           }
       })
   }
+  setShare(money){
+    let storage=sessionStorage.getItem('__mall__userId__')
+    $.ajax({
+        type:'post',
+        data:{
+            token:getToken(),
+            type:3,
+            monetory:money,
+            recommendId:storage
+        },
+        url:baseUrl+'/share',
+        success(res){}
+    })
+  }
   //支付
   payment(orderId,orderMoney){
       var that = this;
@@ -217,6 +231,10 @@ class Order extends Component {
                           function(res){     
                               if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                   Toast.info("支付成功",1);
+                                  let storage=sessionStorage.getItem('__mall__userId__')
+                                  if(storage){
+                                    that.setShare(orderMoney)
+                                  }
                                   that.props.history.push('/my/orderdetail/'+orderId)
                               }else{
                                 that.props.history.push('/my/orderdetail/'+orderId)

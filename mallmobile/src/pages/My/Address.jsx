@@ -99,6 +99,7 @@ class Address extends Component {
                         this.state.list.map((item,i)=>{
                             return (
                                 <SwipeAction
+                                    autoClose={true}
                                     key={i}
                                     style={{backgroundColor: '#f5f5f9',paddingBottom:'10px'}}
                                     right={[

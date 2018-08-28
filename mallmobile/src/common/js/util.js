@@ -1,3 +1,4 @@
+
 export const baseUrl = "http://chaoliu.huibada.cn/mc-shopping/api"
 export const imgUrl = "http://exotic.gzfenzu.com"
 
@@ -16,8 +17,8 @@ export const getToken = ()=>{
   var token = localStorage.getItem('__mall__token__')
   if (!token) {
       // return '3517dcab16b368c11e12f70369b50185RR20A85m3b7TZyoU0w78330NO69o3oR2De1770Sg5a98l2U9q13c8Mk6V11o25z6'
-      // return '3517dcab16b368c11e12f70369b50185g99yX3n36e80M0t99u1Ybw00M6286O605yn2JbM81u06i6439iDD87NS083751L1'
-      return null
+      return '3517dcab16b368c11e12f70369b50185g99yX3n36e80M0t99u1Ybw00M6286O605yn2JbM81u06i6439iDD87NS083751L1'
+      // return null
   } else {
     return token
   }
@@ -36,6 +37,22 @@ export const locationHref =()=>{
   var oper_url = open_weixin + '?appid=' + app_id + '&redirect_uri=' + ret_url + '&response_type=code&scope=snsapi_userinfo&state=null#wechat_redirect'
   return oper_url
 }
+export const WeixinApi = (function () { 
+  /* 这里省略了一堆代码……下面直接看调用接口 */ 
+  return {
+      ready           :window.wxJsBridgeReady?window.wxJsBridgeReady:()=>{},
+      shareToTimeline :window.weixinShareTimeline?window.weixinShareTimeline:()=>{},
+      shareToWeibo    :window.weixinShareWeibo?window.weixinShareWeibo:()=>{},
+      shareToFriend   :window.weixinSendAppMessage?window.weixinSendAppMessage:()=>{},
+      showOptionMenu  :window.showOptionMenu?window.showOptionMenu:()=>{},
+      hideOptionMenu  :window.hideOptionMenu?window.hideOptionMenu:()=>{},
+      showToolbar     :window.showToolbar?window.showToolbar:()=>{},
+      hideToolbar     :window.hideToolbar?window.hideToolbar:()=>{},
+      getNetworkType  :window.getNetworkType?window.getNetworkType:()=>{},
+      imagePreview    :window.imagePreview?window.imagePreview:()=>{},
+  };    
+
+});
 export const formatTime = (date)=>{
   var year = date.getFullYear()
   var month = date.getMonth() + 1

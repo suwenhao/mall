@@ -7,8 +7,9 @@ import MyHeaderWrap from '@components/My/My/MyHeaderWrap'
 import MyOrder from '@components/My/My/MyOrder'
 import Header from '@components/Header/Header'
 import $ from 'jquery'
-import {baseUrl,getToken} from '@common/js/util.js'
+import {baseUrl,getToken,WeixinApi} from '@common/js/util.js'
 import '@common/styles/my.scss'
+import QRCode from 'qrcode'
 
 class My extends Component {
     constructor(props) {
@@ -16,12 +17,13 @@ class My extends Component {
         this.state={
             userInfo:{},
             clicked: 'none',
+            code:'',
             dataList:[
-                { url: 'apay.png', title: '支付宝' },
-                { url: 'weibo.png', title: '新浪微博' },
-                { url: 'shenghuoquan.png', title: '生活圈' },
+                // { url: 'apay.png', title: '支付宝' },
+                // { url: 'weibo.png', title: '新浪微博' },
+                { url: 'shenghuoquan.png', title: '朋友圈' },
                 { url: 'weixin.png', title: '微信好友' },
-                { url: 'qq.png', title: 'QQ' }
+                // { url: 'qq.png', title: 'QQ' }
             ].map(obj => ({
                 icon: <img src={require(`@common/images/${obj.url}`)} alt={obj.title} style={{ width: 36 }} />,
                 title: obj.title,
@@ -42,11 +44,43 @@ class My extends Component {
         },
         (buttonIndex) => {
             self.setState({ clicked: buttonIndex > -1 ? self.state.dataList[buttonIndex].title : 'cancel' });
-            // also support Promise
-            return new Promise((resolve) => {
-                Toast.info('正在分享');
-                setTimeout(resolve, 1000);
-            });
+            if(self.state.dataList[buttonIndex].title==='朋友圈'){
+                // also support Promise
+                self.shareToTimeline(()=>{
+                    $.ajax({
+                        type:'post',
+                        data:{
+                            token:getToken(),
+                            type:1,
+                            monetory:'',
+                            recommendId:''
+                        },
+                        url:baseUrl+'/share',
+                        success(res){
+                            Toast.info('分享成功',);
+                        }
+                    })
+                    
+                })
+            }else if(self.state.dataList[buttonIndex].title==='微信好友'){
+                
+                self.shareToFriend(()=>{
+                    $.ajax({
+                        type:'post',
+                        data:{
+                            token:getToken(),
+                            type:1,
+                            monetory:'',
+                            recommendId:''
+                        },
+                        url:baseUrl+'/share',
+                        success(res){
+                            Toast.info('分享成功',);
+                        }
+                    })
+                })
+            }
+            
         });
     }
     //获取用户信息
@@ -75,9 +109,79 @@ class My extends Component {
     tip(){
         Toast.info("正在努力开发中",1)
     }
+    codeImg(){
+        let that = this
+        QRCode.toDataURL('http://chaoliu.huibada.cn/mc-shopping/index.html?userId=12345').then(url => {
+            that.setState({
+                code:url
+            })
+        })
+    }
+    // 点击分享给好友
+    shareToFriend(cb){
+        let that = this
+        WeixinApi.ready((Api)=>{
+            // 微信分享的数据
+            var wxData = {
+                "imgUrl":that.state.code,
+                "link":'http://chaoliu.huibada.cn/mc-shopping/index.html?userId=12345',
+                "desc":'榴莲商城 新鲜水果网购',
+                "title":"榴莲商城"
+            };
+            // 分享的回调
+            var wxCallbacks = {
+                // 分享操作开始之前
+                ready:function () {
+                    Toast.info("正在分享")
+                },
+                // 分享失败了
+                fail:function (resp) {
+                    Toast.info("网络出错",1)
+                },
+                // 分享成功
+                confirm:function (resp) {
+                    cb&&cb()
+                },
+            };
+            // 点击分享给好友，会执行下面这个代码
+            WeixinApi.shareToFriend(wxData, wxCallbacks);
+        }) 
+    }
+    // 点击分享到朋友圈
+    shareToTimeline(cb){
+        let that = this
+        WeixinApi.ready((Api)=>{
+            // 微信分享的数据
+            var wxData = {
+                "imgUrl":that.state.code,
+                "link":'http://chaoliu.huibada.cn/mc-shopping/index.html?userId=12345',
+                "desc":'榴莲商城 新鲜水果网购',
+                "title":"榴莲商城"
+            };
+            // 分享的回调
+            var wxCallbacks = {
+                // 分享操作开始之前
+                ready:function () {
+                    Toast.info("正在分享",1)
+                },
+                // 分享失败了
+                fail:function (resp) {
+                    Toast.info("网络出错",1)
+                },
+                // 分享成功
+                confirm:function (resp) {
+                    // 分享成功了，我们是不是可以做一些分享统计呢？
+                    cb&&cb()
+                },
+            };
+            // 点击分享到朋友圈
+            WeixinApi.shareToTimeline(wxData, wxCallbacks);
+        }) 
+    }
     //挂载组件
     componentDidMount(){
         this.getUserInfo()
+        this.codeImg()
     }
     render() {
         return (
@@ -114,7 +218,7 @@ class My extends Component {
                                 </span>
                             </a>
                             <a onClick={()=>{
-                                this.tip()
+                                window.location.href="tel:13726686145"
                             }}>
                                 <img src={require(`@common/images/client.jpg`)} alt=""/>
                                 <span>
@@ -123,7 +227,7 @@ class My extends Component {
                                 </span>
                             </a>
                             <a onClick={()=>{
-                                this.tip()
+                                this.goto('/my/community');
                             }}>
                                 <img src={require(`@common/images/community.jpg`)} alt=""/>
                                 <span>
@@ -132,7 +236,7 @@ class My extends Component {
                                 </span>
                             </a>
                             <a onClick={()=>{
-                                this.tip()
+                                this.goto('/my/school')
                             }}>
                                 <img src={require(`@common/images/school.jpg`)} alt=""/>
                                 <span>

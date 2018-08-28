@@ -20,6 +20,11 @@ import Address from '@pages/My/Address'   //地址列表
 import AddressAdd from '@pages/My/AddressAdd'  //新建地址
 import AddressEdit from '@pages/My/AddressEdit'  //编辑地址
 import Logistics from '@pages/My/Logistics'  //物流
+import Community from '@pages/My/Community'  //榴莲社区
+import CommunityDetail from '@pages/My/CommunityDetail'  //榴莲社区详情
+import CommunityComment from '@pages/My/CommunityComment'  //榴莲社区发布
+import School from '@pages/My/School'  //榴莲学堂
+import SchoolDetail from '@pages/My/SchoolDetail'  //榴莲学堂详情
 
 class Mypage extends Component {
     render(){
@@ -39,6 +44,11 @@ class Mypage extends Component {
                 <Route exact path='/my/helpback' component={Helpback}></Route>
                 <Route exact path='/my/feedback' component={MyFeedback}></Route>
                 <Route exact path='/my/browserecord' component={BrowseRecord}></Route>
+                <Route exact path='/my/community' component={Community}></Route>
+                <Route exact path='/my/communitydetail/:id' component={CommunityDetail}></Route>
+                <Route exact path='/my/communitycomment' component={CommunityComment}></Route>
+                <Route exact path='/my/school' component={School}></Route>
+                <Route exact path='/my/schooldetail/:id' component={SchoolDetail}></Route>
                 <Route render={() => <Redirect to="/404" />} />
             </Switch>
         )

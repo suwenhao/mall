@@ -652,9 +652,11 @@ class GoodsDetail extends Component {
         }
         {/* body-> */}
         <div className="fixed-btns">
-          <div className="icon">
-            <img src={require(`@common/images/msg@default.png`)} alt="客服"/>
-            <span>客服</span>
+          <div className="icon" onClick={()=>{
+            window.location.href="tel:13726686145"
+          }}>
+              <img src={require(`@common/images/msg@default.png`)} alt="客服"/>
+              <span>客服</span>
           </div>
           <button className="btn-orange" onClick={()=>{
             this.addGoodOrCart()

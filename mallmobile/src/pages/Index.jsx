@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux'
 import * as routerAction from '@actions/routerAction'
 import * as loadAction from '@actions/loadAction'
 import {Route,Switch,Redirect} from 'react-router-dom'
-import {getToken, locationHref} from '@common/js/util'
+import {baseUrl, getToken, locationHref,getQueryString} from '@common/js/util'
 
 //css
 import '@common/styles/index.scss'
@@ -20,6 +20,7 @@ import Comments from '@/pages/Comments';
 import Order from '@/pages/Order';
 import Search from '@/pages/Search';
 import Searchlist from '@/pages/Searchlist';
+import $ from 'jquery'
 
 class Index extends Component {
     authRoute(){
@@ -33,8 +34,38 @@ class Index extends Component {
     getCartNum(){
         this.props.load.getCartList()
     }
+    getShare(){
+        let userId=getQueryString('userId')
+        let storage=sessionStorage.getItem('__mall__userId__')
+        if(userId){
+            console.log(storage)
+            if(storage){
+                return;
+            }else{
+                if(getToken()){
+                    $.ajax({
+                        type:'post',
+                        data:{
+                            token:getToken(),
+                            type:2,
+                            monetory:'',
+                            recommendId:userId
+                        },
+                        url:baseUrl+'/share',
+                        success(res){
+
+                        }
+                    })
+                }else{
+                    sessionStorage.setItem('__mall__userId__',userId)
+                }
+            }
+            
+        }
+    }
     render(){
         this.authRoute()
+        this.getShare()
         this.getCartNum()
         let pathTF = false;
         this.props.paths.forEach(v=>{
