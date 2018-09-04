@@ -52,6 +52,16 @@ class Integral extends Component {
           dataType:'json',
           success(res){
               if(res.code===0){
+                res.data.rows=res.data.rows.map(v=>{
+                    v.id=v.id+''
+                    let y=v.id.substring(0,2);
+                    let m=v.id.substring(2,4);
+                    let d=v.id.substring(4,6);
+                    return {
+                        ...v,
+                        time:'20'+y+'-'+m+'-'+d
+                    }
+                })
                   that.setState({
                       list:res.data.rows,
                       totalPage:res.data.totalPage,
@@ -89,6 +99,16 @@ class Integral extends Component {
               dataType:'json',
               success(res){
                   if(res.code===0){
+                    res.data.rows=res.data.rows.map(v=>{
+                        v.id=v.id+''
+                        let y=v.id.substring(0,2);
+                        let m=v.id.substring(2,4);
+                        let d=v.id.substring(4,6);
+                        return {
+                            ...v,
+                            time:'20'+y+'-'+m+'-'+d
+                        }
+                    })
                       let newData=that.state.list.concat(res.data.rows)
                       that.setState({
                           list:newData,
@@ -178,7 +198,7 @@ class Integral extends Component {
                                       '分享好友加积分'
                                       :
                                       item.type===2?
-                                      '分享朋友圈加积分'
+                                      '分享好友加积分'
                                       :
                                       item.type===3?
                                       '好友购买加积分'
@@ -186,7 +206,7 @@ class Integral extends Component {
                                       '消费积分'
                                   }
                                   </h2>
-                                  <div>{formatDate(item.updateTime)}</div>
+                                  <div>{item.time}</div>
                               </div>
                               <div className="i-right red">
                                     {

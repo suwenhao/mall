@@ -36,44 +36,46 @@ class CommunityComment extends Component {
         files = Array.prototype.slice.call(files);
         
         if(files.length>9||(this.state.images.length+files.length)>9){
-            Toast.info("最多只能上传5张图片",1);
+            Toast.info("最多只能上传9张图片",1);
             return;
         }
         //循环图片
         files.forEach((file, i)=>{
-            if(!/jpeg|jpg|png/.test(file.type)){
-                Toast.info("仅支持上传jpg、jpeg、png格式的图片",1);
-                return;
-            }
-            let fileReader = new FileReader();
-            //获取图片大小
-            let fileSize = file.size/1024>1024?(file.size/1024/1024).toFixed(2)+"MB":~~(file.size/1024)+"KB";
-            //$(".progress").text(fileSize);
-            //FILE API读取文件
-            fileReader.onload=function () {
-                let result = this.result;
-                let image = new Image();
-                image.src=result;
-                //超出大小，压缩
-                if(result.length>maxFileSize){
-                    if(image.complete){
-                        callback();
-                    }else{
-                        image.onload = callback;
-                        compress(image);
-                    }
-                }else{
-                    self.upload(result,file.type);
-                    dom.value=""
+            setTimeout(()=>{
+                if(!/jpeg|jpg|png/.test(file.type)){
+                    Toast.info("仅支持上传jpg、jpeg、png格式的图片",1);
                     return;
                 }
-                function callback(){
-                    let data = compress(image);
-                    self.upload(data,file.type);
-                    dom.value=""
+                let fileReader = new FileReader();
+                //获取图片大小
+                let fileSize = file.size/1024>1024?(file.size/1024/1024).toFixed(2)+"MB":~~(file.size/1024)+"KB";
+                //$(".progress").text(fileSize);
+                //FILE API读取文件
+                fileReader.onload=function () {
+                    let result = this.result;
+                    let image = new Image();
+                    image.src=result;
+                    //超出大小，压缩
+                    if(result.length>maxFileSize){
+                        if(image.complete){
+                            callback();
+                        }else{
+                            image.onload = callback;
+                            compress(image);
+                        }
+                    }else{
+                        self.upload(result,file.type);
+                        dom.value=""
+                        return;
+                    }
+                    function callback(){
+                        let data = compress(image);
+                        self.upload(data,file.type);
+                        dom.value=""
+                    }
                 }
-            }
-            fileReader.readAsDataURL(file);
+                fileReader.readAsDataURL(file);
+            },200)
         });
         //图片压缩
         function compress(image){
@@ -129,16 +131,16 @@ class CommunityComment extends Component {
         // document.getElementsByTagName("body")[0].appendChild(link);
         $.ajax({
             type: 'post',
-            url: baseUrl+'/fileUpload',
+            url: baseUrl+'/fileUploadBase64',
             data: formData,
             processData: false,
             contentType: false,
             success(res){
                 if (res.code == 0) {
-                    Toast.info("上传成功",1)
+                    Toast.info("上传成功",1) 
                     self.setState({
                         images:[...self.state.images,{
-                            src:imgUrl+res.data,
+                            src:imgUrl+res.data.url,
                             id:new Date().getTime(),
                             w:500,
                             h:500
@@ -204,34 +206,37 @@ class CommunityComment extends Component {
         let that=this
         if(this.state.content===""){
             Toast.info("内容不能为空",1)
+        }if(this.state.images<1){
+            Toast.info("请选择图片",1)
         }else{
             this.setState({
                 ds:true
             })
             let params = {
-                pictrues:this.state.images.map((v)=>{
-                    return v.src
+                token:getToken(),
+                picture:this.state.images.map((v)=>{
+                    return v.src.replace('http://exotic.gzfenzu.com','')
                 }).join(','),
                 content:this.state.content,
             }
             console.log(params)
-            // $.ajax({
-            //     type:'post',
-            //     data:params,
-            //     url:baseUrl+'/commentOrder',
-            //     success(res){
-            //         console.log(res)
-            //         if(res.code == 0){
-            //             Toast.info('发布成功',1);
-            //             that.props.history.push('/my/community')
-            //         }else if(res.code==2){
-            //             Toast.info(res.message,1);
-            //         }
-            //         that.setState({
-            //             ds:false
-            //         })
-            //     }
-            // })
+            $.ajax({
+                type:'post',
+                data:params,
+                url:baseUrl+'/durianCommunity/submit',
+                success(res){
+                    console.log(res)
+                    if(res.code === 0){
+                        Toast.info('发布成功',1);
+                        that.props.history.push('/my/communityissue')
+                    }else if(res.code==2){
+                        Toast.info(res.message,1);
+                    }
+                    that.setState({
+                        ds:false
+                    })
+                }
+            })
         }
     }
     //挂载组件

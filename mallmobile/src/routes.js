@@ -9,7 +9,7 @@ import VConsole from 'vconsole'
 
 class Routes extends Component {
     componentDidMount(){
-        // let vc = new VConsole();
+        //let vc = new VConsole();
     }
     render(){
         return (

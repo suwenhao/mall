@@ -55,46 +55,46 @@ class Search extends Component {
         <SearchHead value={querystring} returnbtn={true} goto={this.gotoList.bind(this)}></SearchHead>
         {
           this.props.searchVal.length<1
-          ?
-          <div className="search-main">
-            <div className="search-land search-history">
-              <label>
-                <span>最近搜索</span>
-                <img src={require(`@common/images/delete.png`)} alt="delete" onClick={()=>{
-                  this.removeHistory()
-                }}/>
-              </label>
-              <div className="search-tag">
-                {
-                  this.state.history.length>0?
-                  this.state.history.map((v,i)=>{
-                    return (<Tag key={i} onClick={()=>{
-                     this.gotoList(v)
-                    }}>{v}</Tag>)
-                  })
-                  :<div style={{textAlign:'center',padding:'20px'}}>暂无历史</div>
-                }
-              </div>
+          ?null:null
+        }
+        <div className="search-main">
+          <div className="search-land search-history">
+            <label>
+              <span>最近搜索</span>
+              <img src={require(`@common/images/delete.png`)} alt="delete" onClick={()=>{
+                this.removeHistory()
+              }}/>
+            </label>
+            <div className="search-tag">
+              {
+                this.state.history.length>0?
+                this.state.history.map((v,i)=>{
+                  return (<Tag key={i} onClick={()=>{
+                    this.gotoList(v)
+                  }}>{v}</Tag>)
+                })
+                :<div style={{textAlign:'center',padding:'20px'}}>暂无历史</div>
+              }
             </div>
-            {/* <div className="search-land search-hot">
-              <label>
-                <span>热门搜索</span>
-              </label>
-              <div className="search-tag">
-                {
-                  this.state.searchHot.length>0?
-                  this.state.searchHot.map((v,i)=>{
-                    return (<Tag key={i} onClick={()=>{
-                      this.gotoList(v)
-                    }}>{v}</Tag>)
-                  })
-                  :<div style={{textAlign:'center',padding:'20px'}}>暂无热门</div>
-                }
-              </div>
-            </div> */}
           </div>
-          :
-          <div className="search-main searct-lists">
+          {/* <div className="search-land search-hot">
+            <label>
+              <span>热门搜索</span>
+            </label>
+            <div className="search-tag">
+              {
+                this.state.searchHot.length>0?
+                this.state.searchHot.map((v,i)=>{
+                  return (<Tag key={i} onClick={()=>{
+                    this.gotoList(v)
+                  }}>{v}</Tag>)
+                })
+                :<div style={{textAlign:'center',padding:'20px'}}>暂无热门</div>
+              }
+            </div>
+          </div> */}
+        </div>
+        {/* <div className="search-main searct-lists">
             <ul>
               {
                 this.state.searchList.length>0?
@@ -109,8 +109,7 @@ class Search extends Component {
                 <li style={{textAlign:'center',padding:'20px'}}>暂时数据</li>
               }
             </ul>
-          </div>
-        }
+          </div> */}
       </div>
     )
   }

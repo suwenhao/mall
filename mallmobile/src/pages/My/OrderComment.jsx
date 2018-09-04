@@ -163,7 +163,7 @@ class OrderComment extends Component {
         // document.getElementsByTagName("body")[0].appendChild(link);
         $.ajax({
             type: 'post',
-            url: baseUrl+'/fileUpload',
+            url: baseUrl+'/fileUploadBase64',
             data: formData,
             processData: false,
             contentType: false,
@@ -172,7 +172,7 @@ class OrderComment extends Component {
                     Toast.info("上传成功",1)
                     let order=self.state.order;
                     order[index].images=[...order[index].images,{
-                        src:imgUrl+res.data,
+                        src:imgUrl+res.data.url,
                         id:new Date().getTime(),
                         w:500,
                         h:500

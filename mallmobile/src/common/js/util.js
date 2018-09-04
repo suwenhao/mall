@@ -1,3 +1,4 @@
+import $ from 'jquery'
 
 export const baseUrl = "http://chaoliu.huibada.cn/mc-shopping/api"
 export const imgUrl = "http://exotic.gzfenzu.com"
@@ -12,16 +13,36 @@ export const unique = (array)=>{
       if (n.indexOf(array[i]) === -1) n.push(array[i]);
     }
     return n;
-}
+} 
 export const getToken = ()=>{
   var token = localStorage.getItem('__mall__token__')
   if (!token) {
-      // return '3517dcab16b368c11e12f70369b50185RR20A85m3b7TZyoU0w78330NO69o3oR2De1770Sg5a98l2U9q13c8Mk6V11o25z6'
-      return '3517dcab16b368c11e12f70369b50185g99yX3n36e80M0t99u1Ybw00M6286O605yn2JbM81u06i6439iDD87NS083751L1'
+      // return '7f202776911755d479254e896cd9537265Qo6d7Z8Cpy72Z4Y43S2117ukY4aU1O7585949AaVxTOn37L3522645g0R1P4e8'
+      return '3517dcab16b368c11e12f70369b501852799IzFwPn54xG45lu9pXUKl6125ew8J4n6y43E7Z312qNUz58B4Y3d0XO2yObz8'
       // return null
   } else {
     return token
   }
+}
+export const getJSsdkParams=(cb)=>{
+  var token = localStorage.getItem('__mall__token__')
+  if (!token) {
+    // token = '7f202776911755d479254e896cd9537265Qo6d7Z8Cpy72Z4Y43S2117ukY4aU1O7585949AaVxTOn37L3522645g0R1P4e8'
+    token='3517dcab16b368c11e12f70369b501852799IzFwPn54xG45lu9pXUKl6125ew8J4n6y43E7Z312qNUz58B4Y3d0XO2yObz8'
+    // token = null
+  }
+  $.ajax({
+    type:'post',
+    data:{
+      token:token,
+      url:'http://chaoliu.huibada.cn/mc-shopping/index.html'
+    },
+    async:false,
+    url:'http://chaoliu.huibada.cn/mc-shopping/api/getJsApiSdk',
+    success(res){
+      cb&&cb(res)
+    }
+  })
 }
 export const getQueryString=(name)=>{
   var result = window.location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
@@ -31,28 +52,18 @@ export const getQueryString=(name)=>{
   return result[1];
 }
 export const locationHref =()=>{
+  var userId=getQueryString('userId')
+  if(userId){
+    localStorage.setItem('__mall__userId__',userId)
+  }else{
+    localStorage.removeItem('__mall__userId__')
+  }
   var ret_url = "http://chaoliu.huibada.cn/mc-shopping/getLogin.html"
   var open_weixin = 'https://open.weixin.qq.com/connect/oauth2/authorize'
   var app_id = 'wx36cf3578e22c3eb5'
   var oper_url = open_weixin + '?appid=' + app_id + '&redirect_uri=' + ret_url + '&response_type=code&scope=snsapi_userinfo&state=null#wechat_redirect'
   return oper_url
 }
-export const WeixinApi = (function () { 
-  /* 这里省略了一堆代码……下面直接看调用接口 */ 
-  return {
-      ready           :window.wxJsBridgeReady?window.wxJsBridgeReady:()=>{},
-      shareToTimeline :window.weixinShareTimeline?window.weixinShareTimeline:()=>{},
-      shareToWeibo    :window.weixinShareWeibo?window.weixinShareWeibo:()=>{},
-      shareToFriend   :window.weixinSendAppMessage?window.weixinSendAppMessage:()=>{},
-      showOptionMenu  :window.showOptionMenu?window.showOptionMenu:()=>{},
-      hideOptionMenu  :window.hideOptionMenu?window.hideOptionMenu:()=>{},
-      showToolbar     :window.showToolbar?window.showToolbar:()=>{},
-      hideToolbar     :window.hideToolbar?window.hideToolbar:()=>{},
-      getNetworkType  :window.getNetworkType?window.getNetworkType:()=>{},
-      imagePreview    :window.imagePreview?window.imagePreview:()=>{},
-  };    
-
-});
 export const formatTime = (date)=>{
   var year = date.getFullYear()
   var month = date.getMonth() + 1

@@ -41,6 +41,26 @@ class OrderDetail extends Component {
             }
         })
     }
+    setShare(money){
+        let storage=localStorage.getItem('__mall__userId__')
+        if(storage){
+            $.ajax({
+                type:'post',
+                data:{
+                    token:getToken(),
+                    type:3,
+                    monetary:money,
+                    recommendId:storage
+                },
+                url:baseUrl+'/point/share',
+                success(res){
+                  console.log('获取点击积分')
+                }
+            })
+        }else{
+            return;
+        }
+    }
     //支付
     payment(){
         let that = this;
@@ -74,6 +94,9 @@ class OrderDetail extends Component {
                                 function(res){     
                                     if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                         Toast.info("支付成功",1);
+                                        that.setShare(that.state.order.orderMoney)
+                                        that.props.history.push('/my/orderlist')
+                                    }else{
                                         that.props.history.push('/my/orderlist')
                                     }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
                                 }

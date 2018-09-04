@@ -2,25 +2,31 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import * as routerAction from '@actions/routerAction'
-import {Toast,PullToRefresh } from 'antd-mobile'
+import {Popover,Icon,Toast,PullToRefresh } from 'antd-mobile'
 import TextHeader from '@components/Header/TextHeader'
 import Loading from '@base/Loading'
 import $ from 'jquery'
-import {baseUrl,getToken} from '@common/js/util.js'
+import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
 
 import '@common/styles/community.scss'
+
+const Item = Popover.Item;
 
 class Community extends Component {
     constructor(props){
         super(props)
+        let ww=document.documentElement.clientWidth-20
         this.state={
             refreshing:false,
             down:false,
             height:document.documentElement.clientHeight-46,
-            list:[{id:1},{id:2},{id:3}],
+            imgWidth:ww,
+            imgHeight:ww*20/35,
+            list:[],
             pageNumber:1,
             pageSize:10,
             loading:true,
+            visible:false,
             totalPage:1,
             tip:false,
         }
@@ -29,7 +35,10 @@ class Community extends Component {
     resize(){
         let self =this;
         $(window).on('resize',()=>{
+            let ww=document.documentElement.clientWidth-20
             self.setState({
+                imgWidth:ww,
+                imgHeight:ww*20/35,
                 height:document.documentElement.clientHeight-46
             })
         })
@@ -38,41 +47,118 @@ class Community extends Component {
     getCommunityList(){
         let that = this
         let params = {
-            token:getToken()
+            token:getToken(),
+            pageNumber:this.state.pageNumber,
+            pageSize:this.state.pageSize,
         }
-        this.setState({
-            loading:false,
+        $.ajax({
+            type:'get',
+            url:baseUrl+'/durianCommunity/list',
+            data:params,
+            dataType:'json',
+            success(res){
+                console.log(res)
+                if(res.code===0){
+                    setTimeout(()=>{
+                        res.data.rows=res.data.rows.map(v=>{
+                            v.id=v.id+''
+                            let y=v.id.substring(0,2);
+                            let m=v.id.substring(2,4);
+                            let d=v.id.substring(4,6);
+                            return {
+                                ...v,
+                                time:'20'+y+'-'+m+'-'+d
+                            }
+                        })
+                        that.setState({
+                            list:res.data.rows,
+                            // list:[],
+                            totalPage:res.data.totalPage,
+                            loading:false,
+                            pageNumber:that.state.pageNumber+1,
+                            pageSize:10,
+                            tip:res.data.rows.length>0?false:true,
+                            // tip:true
+                        })
+                    },50)
+                }else{
+                    Toast.info('获取失败',1)
+                }
+            },
+            error(err){
+                Toast.info('获取失败',1)
+            }
         })
-        // $.ajax({
-        //     type:'post',
-        //     url:baseUrl+'/',
-        //     data:params,
-        //     dataType:'json',
-        //     success(res){
-        //         console.log(res)
-        //         res.data.balance=res.data.balance.toFixed(2)
-        //         that.setState({
-        //             userInfo:res.data
-        //         })
-        //     },
-        //     error(err){
-        //         Toast.info('获取失败',1)
-        //     }
-        // })
     }
     //加载更多
     getRefresh(cb){
-
+        let that = this
+        if(this.state.pageNumber>this.state.totalPage){
+            this.setState({ refreshing: false });
+            return;
+        }else{
+            let params = {
+                token:getToken(),
+                pageNumber:this.state.pageNumber,
+                pageSize:this.state.pageSize
+            }
+            $.ajax({
+                type:'get',
+                url:baseUrl+'/durianCommunity/list',
+                data:params,
+                dataType:'json',
+                success(res){
+                    if(res.code===0){
+                        res.data.rows=res.data.rows.map(v=>{
+                            v.id=v.id+''
+                            let y=v.id.substring(0,2);
+                            let m=v.id.substring(2,4);
+                            let d=v.id.substring(4,6);
+                            return {
+                                ...v,
+                                time:'20'+y+'-'+m+'-'+d
+                            }
+                        })
+                        let newData=that.state.list.concat(res.data.rows)
+                        that.setState({
+                            list:newData,
+                            loading:false,
+                            pageNumber:that.state.pageNumber+1,
+                            pageSize:10,
+                            tip:newData.length>0?false:true,
+                            totalPage:res.data.totalPage,
+                            refreshing: false 
+                        },()=>{
+                            cb&&cb()
+                        })
+                    }else{
+                        Toast.info('获取失败',1)
+                    }
+                },
+                error(err){
+                    Toast.info('获取失败',1)
+                }
+            })
+        }
     }
     //跳转
-    goto(path,id){
-        if(id){
-            this.props.history.push(path+id)
-            this.props.router.changePath(path+id)
-        }else{
-            this.props.history.push(path)
-            this.props.router.changePath(path)
-        }
+    goto(path){
+        this.props.history.push(path)
+        this.props.router.changePath(path)
+        sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+    }
+    handleVisibleChange(visible){
+        this.setState({
+            visible,
+        });
+    }
+    onSelect(opt){
+        console.log(opt.props);
+        this.setState({
+            visible: false,
+            selected: opt.props.value,
+        });
+        this.goto(opt.props.path)
     }
     //挂载组件
     componentDidMount(){
@@ -80,15 +166,34 @@ class Community extends Component {
         this.resize()
     }
     render() {
+        const myImg = src => <img key={src} src={require(`@common/images/${src}.png`)} className="am-icon am-icon-xs" alt="" />;
         return (
         <div className="community-page">
             <TextHeader returnbtn={true} title="榴莲社区" pathname="/my" >
-                <div className="integraldetail" style={{
-                    paddingRight: '10px',
-                    fontSize: '14px',
-                }} onClick={()=>{
-                    this.goto(`/my/communitycomment`)    
-                }}>发布</div>
+                <Popover
+                    key="1" 
+                    mask
+                    overlayClassName="fortest"
+                    overlayStyle={{ color: 'currentColor' }}
+                    visible={this.state.visible}
+                    overlay={[
+                        (<Item path="/my/communityissue" value="我的发布" icon={myImg('list')}>我的发布</Item>),
+                        // (<Item path="/my/communitymycomment" value="我的评论" icon={myImg('msg@default')}>我的评论</Item>),
+                        (<Item path="/my/communitycomment" value="发布" icon={myImg('submit')}>发布</Item>),
+                    ]}
+                    align={{
+                        overflow: { adjustY: 0, adjustX: 0 },
+                        offset: [-10, 0],
+                    }}
+                    onVisibleChange={this.handleVisibleChange.bind(this)}
+                    onSelect={this.onSelect.bind(this)}
+                >
+                    <Icon onClick={()=>{
+                        this.setState({
+                            visible:true
+                        })
+                    }} type="ellipsis"/>
+                </Popover>
             </TextHeader>
             <div className="community-main">
                 <PullToRefresh
@@ -117,21 +222,22 @@ class Community extends Component {
                         this.state.list.map((item,i)=>{
                             return(
                                 <div className="community-item" key={i} onClick={(e)=>{
-                                    this.goto('/my/communitydetail/',item.id)
+                                    this.goto('/my/communitydetail')
+                                    sessionStorage.setItem('__mall__community__',JSON.stringify(item))
                                 }}>
-                                    <div className="community-header">
+                                    <div className="community-header" style={{padding:'10px 0'}}>
                                         <div className="c-left">
                                             <img src={require(`@common/images/avatar.jpg`)} alt=""/>
-                                            <span>流连忘返</span>
+                                            <span>{item.title}</span>
                                         </div>
-                                        <div className="c-right">2018-07-31</div>
+                                        <div className="c-right">{item.time}</div>
                                     </div>
                                     <div className="community-body">
-                                        <div className="desc">榴莲是我最爱的水果，没有之一，很多国家的榴莲都吃过，唯一最好吃的就是马来西亚榴莲，独特的香味透出一丝丝香气，油而不腻是这种榴莲的特征。</div>
+                                        <div className="desc">{item.content}</div>
                                         <div className="pictrues">
                                             <div className="img-item">
                                                 <img src={
-                                                    require(`@common/images/test/u3058.jpg`)
+                                                    imgUrl+item.picture.split(',')[0]
                                                 } alt=""/>
                                             </div>
                                         </div>
@@ -143,13 +249,13 @@ class Community extends Component {
                                                 e.stopPropagation()
                                             }}>
                                                 <img src={require(`@common/images/msg@default.png`)}/>
-                                                <span>12</span>
+                                                <span>{item.comment}</span>
                                             </div>
                                             <div className="c-icon" onClick={(e)=>{
                                                 e.stopPropagation()
                                             }}>
                                                 <img src={require(`@common/images/zan.png`)}/>
-                                                <span>12</span>
+                                                <span>{item.like}</span>
                                             </div>
                                         </div>
                                     </div>

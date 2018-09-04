@@ -38,8 +38,7 @@ class Helpback extends Component {
     this.editor.customConfig.uploadImgParams = {
         fileType: 'image',
         fileModule:'product',
-        isZoom: 0,
-        imgData:''
+        isZoom: 0
     }
     //配置服务器路径
     this.editor.customConfig.uploadImgServer = baseUrl+'/fileUpload'  
@@ -54,7 +53,7 @@ class Helpback extends Component {
             // insertImg 是插入图片的函数，editor 是编辑器对象，result 是服务器端返回的结果
 
             // 举例：假如上传图片成功后，服务器端返回的是 {url:'....'} 这种格式，即可这样插入图片：
-            var url = imgUrl+result.url
+            var url = imgUrl+result.data.url
             insertImg(url)
         }
     }
@@ -106,15 +105,25 @@ class Helpback extends Component {
     return (
       <div className="helpback-page">
         {/* 头部 */}
-        <TextHeader returnbtn={true} title="帮助反馈" pathname="/my">
-          <div className="myfeedback" onClick={()=>{
-            this.props.history.push('/my/feedback')
-            this.props.router.changePath('/my/feedback')
-            sessionStorage.setItem('__search_prev_path__','/my/feedback')
-          }}>我的反馈</div>
-        </TextHeader>
+          <div style={{
+              position:'fixed',
+              zIndex:1000,
+              width:'100%',
+              top:0,
+              left:0
+          }}>
+          <TextHeader returnbtn={true} title="帮助反馈" pathname="/my">
+            <div className="myfeedback" onClick={()=>{
+              this.props.history.push('/my/feedback')
+              this.props.router.changePath('/my/feedback')
+              sessionStorage.setItem('__search_prev_path__','/my/feedback')
+            }}>我的反馈</div>
+          </TextHeader>
+          </div>
          {/* 内容 */}
-        <div className="helpback-main">
+        <div style={{
+            marginTop:'46px'
+          }} className="helpback-main">
           <Tabs tabs={this.state.tabs}
               initialPage={this.state.helpbackIndex}
               tabBarPosition="top"

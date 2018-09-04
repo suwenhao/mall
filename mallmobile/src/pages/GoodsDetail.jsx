@@ -480,7 +480,15 @@ class GoodsDetail extends Component {
           :null
         }
         {/* <-头部 */}
-        <Header returnbtn={true} title="商品详情" pathname={goodsPrevPath||'/'}></Header>
+        <div style={{
+          position:'fixed',
+          top:0,
+          left:0,
+          width:'100%',
+          zIndex:1000
+        }}>
+          <Header returnbtn={true} title="商品详情" pathname={goodsPrevPath||'/'}></Header>
+        </div> 
         {/* 头部-> */}
         {/* <-body */}
         {
@@ -499,6 +507,10 @@ class GoodsDetail extends Component {
             <img src={require(`@common/images/cart_w.png`)} alt=""/>
           </div>
         }
+        <div style={{
+          height:'46px',
+          width:'100%'
+        }}></div>
         {
         this.state.loading?
         <Loading/>

@@ -26,46 +26,51 @@ class Index extends Component {
     authRoute(){
         let token = getToken()
         if(token){
-            return;
+            
         }else{
             window.location.href = locationHref()
         }
+        this.getShare()
     }
     getCartNum(){
         this.props.load.getCartList()
     }
     getShare(){
         let userId=getQueryString('userId')
-        let storage=sessionStorage.getItem('__mall__userId__')
-        if(userId){
-            console.log(storage)
-            if(storage){
-                return;
+        if(getToken()){
+            if(userId){
+                localStorage.setItem('__mall__userId__',userId)
+                window.location.href='http://chaoliu.huibada.cn/mc-shopping/index.html#/my'
             }else{
-                if(getToken()){
+                let userId2 = localStorage.getItem('__mall__userId__')
+                if(userId2){
                     $.ajax({
                         type:'post',
                         data:{
                             token:getToken(),
                             type:2,
-                            monetory:'',
-                            recommendId:userId
+                            monetary:0,
+                            recommendId:userId2
                         },
-                        url:baseUrl+'/share',
+                        url:baseUrl+'/point/share',
                         success(res){
-
+                            console.log('好友获取积分成功')
                         }
                     })
                 }else{
-                    sessionStorage.setItem('__mall__userId__',userId)
+                    return;
                 }
             }
-            
+        }else{
+            if(userId){
+                return;
+            }else{
+                localStorage.removeItem('__mall__userId__')
+            }
         }
     }
     render(){
         this.authRoute()
-        this.getShare()
         this.getCartNum()
         let pathTF = false;
         this.props.paths.forEach(v=>{

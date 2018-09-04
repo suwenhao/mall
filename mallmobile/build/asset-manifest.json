@@ -1,8 +1,8 @@
 {
-  "main.css": "static/css/main.390f6840.css",
-  "main.css.map": "static/css/main.390f6840.css.map",
-  "main.js": "static/js/main.77bc097d.js",
-  "main.js.map": "static/js/main.77bc097d.js.map",
+  "main.css": "static/css/main.05055621.css",
+  "main.css.map": "static/css/main.05055621.css.map",
+  "main.js": "static/js/main.d94f3c7e.js",
+  "main.js.map": "static/js/main.d94f3c7e.js.map",
   "static\\media\\1.jpg": "static/media/1.64deb5b4.jpg",
   "static\\media\\2.dpg": "static/media/2.9f8f401a.dpg",
   "static\\media\\2.jpg": "static/media/2.60185a21.jpg",
@@ -17,11 +17,16 @@
   "static\\media\\cart.svg": "static/media/cart.5157da77.svg",
   "static\\media\\cate.svg": "static/media/cate.6da20723.svg",
   "static\\media\\default-skin.svg": "static/media/default-skin.b257fa9c.svg",
+  "static\\media\\ewm.png": "static/media/ewm.4c646f59.png",
   "static\\media\\index.svg": "static/media/index.76ec9c85.svg",
   "static\\media\\info.jpg": "static/media/info.b66990dc.jpg",
   "static\\media\\logo.less": "static/media/logo.f0f81449.less",
   "static\\media\\logo.svg": "static/media/logo.1025ccaa.svg",
   "static\\media\\my.svg": "static/media/my.42e52345.svg",
   "static\\media\\purse.png": "static/media/purse.b56560d0.png",
-  "static\\media\\success.svg": "static/media/success.70897737.svg"
+  "static\\media\\success.svg": "static/media/success.70897737.svg",
+  "static\\media\\tipshare.jpg": "static/media/tipshare.b12566aa.jpg",
+  "static\\media\\u3058.jpg": "static/media/u3058.43543352.jpg",
+  "static\\media\\u3169.jpg": "static/media/u3169.7878dabf.jpg",
+  "static\\media\\u3314.jpg": "static/media/u3314.435743c3.jpg"
 }

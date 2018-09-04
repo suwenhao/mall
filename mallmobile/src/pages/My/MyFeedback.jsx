@@ -47,6 +47,16 @@ class MyFeedback extends Component {
           dataType:'json',
           success(res){
               if(res.code===0){
+                res.data.rows=res.data.rows.map(v=>{
+                    v.id=v.id+''
+                    let y=v.id.substring(0,2);
+                    let m=v.id.substring(2,4);
+                    let d=v.id.substring(4,6);
+                    return {
+                        ...v,
+                        time:'20'+y+'-'+m+'-'+d
+                    }
+                })
                   that.setState({
                       list:res.data.rows,
                       totalPage:res.data.totalPage,
@@ -84,6 +94,16 @@ class MyFeedback extends Component {
               dataType:'json',
               success(res){
                   if(res.code===0){
+                    res.data.rows=res.data.rows.map(v=>{
+                        v.id=v.id+''
+                        let y=v.id.substring(0,2);
+                        let m=v.id.substring(2,4);
+                        let d=v.id.substring(4,6);
+                        return {
+                            ...v,
+                            time:'20'+y+'-'+m+'-'+d
+                        }
+                    })
                       let newData=that.state.list.concat(res.data.rows)
                       that.setState({
                           list:newData,
@@ -155,7 +175,7 @@ class MyFeedback extends Component {
                       <div className="body" dangerouslySetInnerHTML = {{ __html:item.content!==""?item.content:"暂无反馈内容" }}>
                           
                       </div>
-                      <div className="time">{formatDate(item.updateTime)}</div>
+                      <div className="time">{item.time}</div>
                   </div>
                   )
               })

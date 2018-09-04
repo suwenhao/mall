@@ -37,7 +37,7 @@ class MyHeaderWrap extends Component {
                             className="setting">
                             地址管理
                         </a>
-                        <a 
+                        {/* <a 
                             onClick={()=>{
                                 this.tip()
                             }}
@@ -49,7 +49,7 @@ class MyHeaderWrap extends Component {
                             }}
                             className="setting">
                             消息
-                        </a>
+                        </a> */}
                     </div>
                     <div className="my-section">
                         <div className="my-assets">
