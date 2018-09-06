@@ -27,27 +27,31 @@ class Autoplay extends Component {
                 beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
                 afterChange={index => console.log('slide to', index)}
             >
-                {this.props.data.map((item,i) => (
-                    <a
-                        key={i}
-                        onClick={()=>{
-                            this.props.history.push('/goods/'+item.productId)
-                            sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
-                            sessionStorage.setItem('__goods_prev_path__',this.props.location.pathname)
-                        }}
-                        style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
-                    >
-                        <img
-                            src={`${imgUrl}${item.img}`}
-                            alt=""
-                            style={{touchAction:'none', width: '100%', verticalAlign: 'top' }}
-                            onLoad={(e) => {
-                                e.preventDefault()
-                                window.dispatchEvent(new Event('resize'));
+                {this.props.data.map((item,i) =>{
+                    return (
+                        <a
+                            key={i}
+                            onClick={()=>{
+                                if(item.productId){
+                                    this.props.history.push('/goods/'+item.productId)
+                                    sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+                                    sessionStorage.setItem('__goods_prev_path__',this.props.location.pathname)
+                                }
                             }}
-                        />
-                    </a>
-                ))}
+                            style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
+                        >
+                            <img
+                                src={`${imgUrl}${item.img}`}
+                                alt=""
+                                style={{touchAction:'none', width: '100%', verticalAlign: 'top' }}
+                                onLoad={(e) => {
+                                    e.preventDefault()
+                                    window.dispatchEvent(new Event('resize'));
+                                }}
+                            />
+                        </a>
+                    )
+                })}
             </Carousel>
         )
     }

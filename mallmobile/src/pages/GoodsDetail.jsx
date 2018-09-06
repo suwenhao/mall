@@ -130,9 +130,13 @@ class GoodsDetail extends Component {
       url:baseUrl+'/goodDetail',
       success(res){
         // console.log(res.data.data)
-        that.setState({
-          introduction:res.data.data.introduction
-        })
+        if(res.code===0){
+          if(res.data.data){
+            that.setState({
+              introduction:res.data.data.introduction
+            })
+          }
+        }
       },
       error(){
         that.setState({
@@ -153,37 +157,44 @@ class GoodsDetail extends Component {
       data:params,
       url:baseUrl+'/goodsInfo',
       success(res){
-        let data = res.data
-        data.productImage = imgUrl+ data.productImage; 
-        //组合图片数组
-        let pictures = []
-        //有详细图片时
-        if (data.pictures) {
-            pictures = data.pictures.split(',')
-            for (var i in pictures) {
-                pictures[i] = imgUrl + pictures[i]
-            }
-            pictures.unshift(data.productImage)
-        }
-        //没有详细图片时放入封面图片
-        if (pictures.length < 1) {
-            pictures.push(data.productImage)
-        }
-        //构建图片预览器需要的数据
-        let picobjs=pictures.map(v=>{
-          return {
-            src:v,w:500,h:500
+        if(res.code===0){
+          let data = res.data
+          data.productImage = imgUrl+ data.productImage; 
+          //组合图片数组
+          let pictures = []
+          //有详细图片时
+          if (data.pictures) {
+              pictures = data.pictures.split(',')
+              for (var i in pictures) {
+                  pictures[i] = imgUrl + pictures[i]
+              }
+              pictures.unshift(data.productImage)
           }
-        })
-        data.picobjs=picobjs
-        //更新model
-        that.setState({
-          data,
-          loading:false
-        })
-        //构建规格
-        that.filterData(data)
-        that.getCartList()
+          //没有详细图片时放入封面图片
+          if (pictures.length < 1) {
+              pictures.push(data.productImage)
+          }
+          //构建图片预览器需要的数据
+          let picobjs=pictures.map(v=>{
+            return {
+              src:v,w:500,h:500
+            }
+          })
+          data.picobjs=picobjs
+          //更新model
+          that.setState({
+            data,
+            loading:false
+          })
+          //构建规格
+          that.filterData(data)
+          that.getCartList()
+        }else{
+          Toast.info('暂无此商品',1)
+          setTimeout(()=>{
+            that.props.history.push('/')
+          },1000)
+        }
       },
       error(){
         that.setState({
