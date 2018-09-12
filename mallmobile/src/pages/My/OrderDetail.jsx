@@ -357,10 +357,10 @@ class OrderDetail extends Component {
                     <div className="order_total">
                         <ul>
                             <li>商品总额<span className="price">¥ {this.state.order&&this.state.order.orderMoney.toFixed(2)}</span></li>
-                            <li>优惠金额<span className="price">¥ {this.state.order&&this.state.order.discountMoney.toFixed(2)}</span></li>
+                            {/* <li>优惠金额<span className="price">¥ {this.state.order&&this.state.order.discountMoney.toFixed(2)}</span></li> */}
                             <li>运费<span className="price">+ ¥ {this.state.order&&this.state.order.freight.toFixed(2)}</span></li>
                         </ul> 
-                        <p className="total">实付金额：<span>¥ {this.state.order&&(this.state.order.orderMoney+this.state.order.discountMoney+this.state.order.freight).toFixed(2)}</span></p>
+                        <p className="total">实付金额：<span>¥ {this.state.order&&(this.state.order.orderMoney+this.state.order.freight).toFixed(2)}</span></p>
                     </div>
                 </div>
                 :<div style={{padding:'10px',textAlign:'center'}}>缺少参数</div>

@@ -74,7 +74,7 @@ class Comments extends Component {
             }
         })
     }
-      //评论切换
+    //评论切换
     checkComment (i) {
         this.setState({
             pageNumber:1,

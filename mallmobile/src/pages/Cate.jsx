@@ -22,17 +22,11 @@ class Cate extends Component {
         }
     }
     componentDidMount(){
-        if(this.props.cates.length>0){
+        this.props.load.loadCate(()=>{
             this.setState({
                 loading:false
             })
-        }else{
-            this.props.load.loadCate(()=>{
-                this.setState({
-                    loading:false
-                })
-            })
-        }
+        })
     }
     render() {
         let cates = this.props.cates?this.props.cates.map(v=>{

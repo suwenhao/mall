@@ -166,7 +166,7 @@ class CommunityDetail extends Component {
             success(res){
                 let newInfo={
                     ...that.state.info,
-                    like:that.state.info.isLike?that.state.info.like-1:that.state.info.isLike+1,
+                    like:that.state.info.isLike?that.state.info.like-1:that.state.info.like+1,
                     isLike:!that.state.info.isLike
                 }
                 that.setState({

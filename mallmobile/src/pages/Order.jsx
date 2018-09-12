@@ -168,7 +168,7 @@ class Order extends Component {
               console.log(res)
               if(res.code == 0){
                   let orderId = res.data.orderId;
-                  let orderMoney = that.state.orderInfo.totalPrice;
+                  let orderMoney = res.data.orderMoney;
                   that.setState({
                     orderId
                   })
