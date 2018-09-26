@@ -29,7 +29,9 @@ class Logistics extends Component {
             url:baseUrl+'/order/query',
             success(res){
                 var taeckArr=JSON.parse(res.data.result).data;
-                that.list = taeckArr||[]
+                that.setState({
+                    list:taeckArr||[]
+                })
             }
         })
     }

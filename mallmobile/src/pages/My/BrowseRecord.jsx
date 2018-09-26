@@ -18,7 +18,7 @@ class BrowseRecord extends Component {
             height:document.documentElement.clientHeight-46,
             list:[],
             pageNumber:1,
-            pageSize:10,
+            pageSize:10000000,
             loading:true,
             totalPage:1,
             tip:false,
@@ -61,8 +61,17 @@ class BrowseRecord extends Component {
                             })
                         })
                     }
+                    function sequence(a, b) {
+                        if (new Date(b.time).getTime() > new Date(a.time).getTime()) {
+                          return 1;
+                        } else if (new Date(b.time).getTime() < new Date(a.time).getTime()) {
+                          return -1
+                        } else {
+                          return 0;
+                        }
+                      }
                     that.setState({
-                        list:list,
+                        list:list.sort(sequence),
                         totalPage:1,
                         loading:false,
                         pageNumber:that.state.pageNumber+1,

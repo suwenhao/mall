@@ -32,8 +32,8 @@ class Autoplay extends Component {
                         <a
                             key={i}
                             onClick={()=>{
-                                if(item.productId){
-                                    this.props.history.push('/goods/'+item.productId)
+                                if(item.type===1){
+                                    this.props.history.push('/goods/'+item.target)
                                     sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
                                     sessionStorage.setItem('__goods_prev_path__',this.props.location.pathname)
                                 }

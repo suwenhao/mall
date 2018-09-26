@@ -18,8 +18,8 @@ export const getToken = ()=>{
   var token = localStorage.getItem('__mall__token__')
   if (!token) {
       // return '7f202776911755d479254e896cd9537265Qo6d7Z8Cpy72Z4Y43S2117ukY4aU1O7585949AaVxTOn37L3522645g0R1P4e8'
-      return '3517dcab16b368c11e12f70369b501852799IzFwPn54xG45lu9pXUKl6125ew8J4n6y43E7Z312qNUz58B4Y3d0XO2yObz8'
-      // return null
+      // return 'eca93750ea21a54fc938b6d3a41d3adfWHj1U9399Dzi7HAx671c8AixVs79Lu0J1cI8nSd8170ou54n8394lpRj98GeR1o5'
+      return null
   } else {
     return token
   }
@@ -28,8 +28,8 @@ export const getJSsdkParams=(cb)=>{
   var token = localStorage.getItem('__mall__token__')
   if (!token) {
     // token = '7f202776911755d479254e896cd9537265Qo6d7Z8Cpy72Z4Y43S2117ukY4aU1O7585949AaVxTOn37L3522645g0R1P4e8'
-    token='3517dcab16b368c11e12f70369b501852799IzFwPn54xG45lu9pXUKl6125ew8J4n6y43E7Z312qNUz58B4Y3d0XO2yObz8'
-    // token = null
+    // token='eca93750ea21a54fc938b6d3a41d3adfWHj1U9399Dzi7HAx671c8AixVs79Lu0J1cI8nSd8170ou54n8394lpRj98GeR1o5'
+    token = null
   }
   $.ajax({
     type:'post',

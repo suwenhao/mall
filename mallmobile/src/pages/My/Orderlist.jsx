@@ -237,7 +237,7 @@ class Orderlist extends Component {
     let reqType = 1;  //请求类型 1-订单 2-卡券 3-团购 4-充值 5-其他
     let params = {
         token: getToken(),
-        totalFee: item.orderMoney,
+        totalFee: item.orderMoney-item.discountMoney,
         outTradeNo: item.orderId,
         reqType: reqType,
         body:''
@@ -265,7 +265,7 @@ class Orderlist extends Component {
                                 if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                     Toast.info("支付成功",1);
                                     that.getOrderList()
-                                    that.setShare(item.orderMoney)
+                                    that.setShare(item.orderMoney-item.discountMoney)
                                     window.location.reload()
                                 }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
                             }
@@ -457,7 +457,7 @@ class Orderlist extends Component {
                               </div>
                               <div className="price">
                                 <span>总&nbsp;&nbsp;&nbsp;&nbsp;价：</span>
-                                <span>￥{item.orderMoney.toFixed(2)}</span>
+                                <span>￥{(item.orderMoney-item.discountMoney).toFixed(2)}</span>
                               </div>
                             </div>
                             <div className="o-right">

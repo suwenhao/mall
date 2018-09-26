@@ -12,7 +12,8 @@ export const getGoodsList = (search,cb) => async(dispatch,state)=>{
         isTop:isTop,
         name:search,
         pageSize:pageSize,
-        pageNumber:1
+        pageNumber:1,
+        labelId:''
     }
     if(endPrice){
         params['endPrice']=endPrice;
@@ -45,7 +46,8 @@ export const getPushGoods = (search,cb) => async(dispatch,state)=>{
         isTop:isTop,
         name:search,
         pageSize:pageSize,
-        pageNumber:pageNumber
+        pageNumber:pageNumber,
+        labelId:''
     }
     if(endPrice){
         params['endPrice']=endPrice;
