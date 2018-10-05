@@ -31,13 +31,15 @@ class Order extends Component {
             label:'到店自提',
             value:3
           }
-        ]
-        ,
-
+        ],
+        index:1,
+        coupons:[],
+        coupon:null,
+        couponIndex:0,
       }
   }
   //获取订单
-  getOrderInfo(){
+  getOrderInfo(cb){
       let order = sessionStorage.getItem('goodDetailData')
       if(order===null){
           Toast.info("没有订单", 1);
@@ -67,7 +69,7 @@ class Order extends Component {
 
       let deliveryArr = uniqArr.map((jtem,j)=>{
         return {
-          value:jtem,
+          value:jtem*1,
           label:presetArr[jtem-1]
         }
       })
@@ -78,6 +80,8 @@ class Order extends Component {
       order.leaveMsg=""
       this.setState({
         orderInfo:order
+      },()=>{
+        cb&&cb()
       })
       console.log('--------订单--------')
       console.log(order)
@@ -131,6 +135,30 @@ class Order extends Component {
         }
     }
   }
+  //选择运送
+  bindPickerChange(val){
+    console.log(val)
+    let orderInfo = this.state.orderInfo
+    orderInfo.deliveryInfo = orderInfo.deliveryArr.find(v=>{
+      return v.value===val
+    })
+    this.setState({
+      index: val,
+      orderInfo
+    })
+  }
+  //选择代金券
+  bindPickerChange1(val){
+    let coupons = this.state.coupons
+    let coupon = coupons.find(v=>{
+      return v.value===val
+    })
+    this.setState({
+      couponIndex: val,
+      coupons,
+      coupon
+    })
+  }
   //提交订单
   clickAccount(){
       //确认订单
@@ -150,7 +178,7 @@ class Order extends Component {
         })
       })
       cart={
-        pickupWay:data.pickupWay.split(',')[0],
+        pickupWay:this.state.orderInfo.deliveryInfo.value,
         goods:grrs
       }
       let params = {
@@ -158,7 +186,8 @@ class Order extends Component {
         cartStr:JSON.stringify([cart]),
         payMethod:'1',
         receiverId:that.state.addr.id,
-        memo:this.state.memo
+        memo:this.state.memo,
+        couponId:this.state.coupon?this.state.coupon.id:''
       }
       $.ajax({
           type:'post',
@@ -183,6 +212,50 @@ class Order extends Component {
           }
       })
   }
+  //获取所有券
+  getCouponList(cb){
+    var that = this;
+    var params = {
+      token: getToken(),
+      amount: this.state.orderInfo.totalPrice,
+      isUsed:false
+    };
+    let url = baseUrl + '/coupon/list'
+    $.ajax({
+      type:'get',
+      dataType:'json',
+      data:params,
+      url:url,
+      success(res){
+        if(res.code===0){
+          if (res.data.data){
+            var newData = res.data.data.map((v, i) => {
+              return {
+                ...v,
+                label: v.title,
+                value: i
+              }
+            });
+          }else{
+            var newData = [];
+          }
+          that.setState({
+            coupons: newData,
+            couponIndex: newData.length-1,
+            coupon: newData.length > 0 ? newData[newData.length - 1]:null
+          },()=>{
+            cb&&cb()
+          })
+        }else{
+          Toast.info('获取失败',1)
+        }
+      },
+      error(err){
+        Toast.info('请求出错',1)
+      }
+    })
+  }
+  //获取购买分享积分
   setShare(money){
     let storage=localStorage.getItem('__mall__userId__')
     if(storage){
@@ -253,8 +326,10 @@ class Order extends Component {
     })
   }
   componentDidMount(){
-    this.getOrderInfo()
-    this.setAddress()
+    this.getOrderInfo(()=>{
+      this.setAddress();
+      this.getCouponList();
+    });
     console.log(this.props)
   }
   render() {
@@ -287,7 +362,7 @@ class Order extends Component {
           }else{
             back()
           }
-        }} returnbtn={true} title="确认订单" pathname={prevPath||'/'}></TextHeader>
+        }} returnbtn={true} title="订单支付" pathname={prevPath||'/'}></TextHeader>
         {
           this.state.loading?
         <Loading/>
@@ -368,9 +443,45 @@ class Order extends Component {
                     </div>
                     <div className="section-top">
                       <List>
-                        <Picker data={this.state.orderInfo&&this.state.orderInfo.deliveryArr} value={["1"]} cols={1} className="forss">
+                        <Picker 
+                          data={this.state.orderInfo&&this.state.orderInfo.deliveryArr} 
+                          value={[this.state.index]} 
+                          cols={1} 
+                          className="forss" 
+                          onOk={(val)=>{
+                            this.bindPickerChange(val[0]);
+                          }}
+                        >
                           <List.Item><span style={{fontSize:'14px'}}>运送方式</span></List.Item>
                         </Picker>
+                        {
+                          this.state.coupons.length<1?
+                          <List.Item className='listitem'><span style={{fontSize:'14px'}}>代金券</span><span style={{fontSize:'14px','color':'#888'}}>无代金券</span></List.Item>
+                          :
+                          <Picker
+                            data={this.state.coupons}
+                            value={[this.state.couponIndex]} 
+                            cols={1} 
+                            className="forss"
+                            onOk={(val)=>{
+                              console.log(val)
+                              this.bindPickerChange1(val[0]);
+                            }}
+                          >
+                            <List.Item><span style={{fontSize:'14px'}}>代金券</span></List.Item>
+                          </Picker>
+                        }
+                        <div style={{padding:'15px 0',margin:'0 15px',borderBottom:'1px solid #eee'}}>
+                          {
+                            this.state.coupon?
+                            <div class='coupon' style={{color:'#ff5b05'}}>
+                              <div>优惠￥{this.state.coupon.faceValue}</div>
+                              <div>订单满{this.state.coupon.useCondition}元使用</div>
+                            </div>
+                            :
+                            <div class='nocoupon'>暂无优惠</div>
+                          }
+                        </div>
                         <TextareaItem
                           title="留言"
                           placeholder="输入留言"
@@ -388,9 +499,10 @@ class Order extends Component {
                     <div className="order_total">
                         <ul>
                             <li>商品金额<span className="price">¥ {this.state.orderInfo&&this.state.orderInfo.totalPrice}</span></li>
+                            <li>代金券<span className="price">- ¥ {this.state.coupon?this.state.coupon.faceValue.toFixed(2):'0.00'}</span></li>
                             <li>运费<span className="price">+ ¥ 0.00</span></li>
                         </ul> 
-                        <p className="total">总价：<span>¥ {this.state.orderInfo&&this.state.orderInfo.totalPrice}</span></p>
+                        <p className="total">总价：<span>¥ {this.state.orderInfo&&(this.state.orderInfo.totalPrice-(this.state.coupon?this.state.coupon.faceValue:0.00)).toFixed(2)}</span></p>
                     </div>
                     <div className="section">
                       <Button type="primary" onClick={()=>{

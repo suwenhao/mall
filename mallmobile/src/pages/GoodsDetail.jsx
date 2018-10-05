@@ -164,7 +164,11 @@ class GoodsDetail extends Component {
           let pictures = []
           //有详细图片时
           if (data.pictures) {
-              pictures = data.pictures.split(',')
+              if(data.pictures.charAt(0)===','){
+                pictures = data.pictures.substring(1).split(',')
+              }else{
+                pictures = data.pictures.split(',')
+              }
               for (var i in pictures) {
                   pictures[i] = imgUrl + pictures[i]
               }
@@ -541,7 +545,7 @@ class GoodsDetail extends Component {
           >
              {  
               this.state.data.picobjs.map((val,i) => (
-                  <a
+                  <div
                     className="carousel-item"
                     key={i}
                     style={this.state.style}
@@ -565,7 +569,7 @@ class GoodsDetail extends Component {
                         })
                       }}
                     />
-                  </a>
+                  </div>
                 ))
               }
           </Carousel>

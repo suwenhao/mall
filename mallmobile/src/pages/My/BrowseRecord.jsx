@@ -128,6 +128,12 @@ class BrowseRecord extends Component {
             })
         }
     }
+    //跳转到商品页
+    gotoGoods(id){
+        this.props.history.push('/goods/'+id)
+        sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
+        sessionStorage.setItem('__goods_prev_path__',this.props.location.pathname)
+    }
     //挂载组件
     componentDidMount(){
         this.getBrowseRecord()
@@ -169,7 +175,9 @@ class BrowseRecord extends Component {
                                    {
                                        item.child.map((jtem,j)=>{
                                            return (
-                                            <div key={j} className="browse-item">
+                                            <div key={j} className="browse-item" onClick={()=>{
+                                                this.gotoGoods(jtem.productId)
+                                            }}>
                                                 <img width="90" src={imgUrl+jtem.productData.thumbnail} alt=""/>
                                                 <div className="browse-right">
                                                     <div className="title">{jtem.productData.name}</div>

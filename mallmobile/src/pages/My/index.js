@@ -11,6 +11,7 @@ import Orderlist from '@/pages/My/Orderlist'        //订单列表
 import OrderDetail from '@/pages/My/OrderDetail'    //订单详情
 import OrderComment from '@pages/My/OrderComment'   //订单评论
 import Helpback from '@/pages/My/Helpback'       //帮助反馈
+import Coupon from '@pages/My/Coupon'          //代金券
 import MyFeedback from '@/pages/My/MyFeedback'   //反馈列表
 import BrowseRecord from '@/pages/My/BrowseRecord'   //浏览记录
 import Mypurse from '@pages/My/Mypurse'   //我的钱包
@@ -26,6 +27,7 @@ import CommunityComment from '@pages/My/CommunityComment'  //榴莲社区发布
 import CommunityIssue from '@pages/My/CommunityIssue'  //榴莲社区发布
 import School from '@pages/My/School'  //榴莲学堂
 import SchoolDetail from '@pages/My/SchoolDetail'  //榴莲学堂详情
+
 
 class Mypage extends Component {
     render(){
@@ -43,6 +45,7 @@ class Mypage extends Component {
                 <Route exact path='/my/orderdetail/:orderId' component={OrderDetail}></Route>
                 <Route exact path='/my/ordercomment/:orderId' component={OrderComment}></Route>
                 <Route exact path='/my/helpback' component={Helpback}></Route>
+                <Route exact path='/my/coupon' component={Coupon}></Route>
                 <Route exact path='/my/feedback' component={MyFeedback}></Route>
                 <Route exact path='/my/browserecord' component={BrowseRecord}></Route>
                 <Route exact path='/my/community' component={Community}></Route>

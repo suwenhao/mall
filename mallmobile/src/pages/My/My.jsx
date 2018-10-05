@@ -47,30 +47,32 @@ class My extends Component {
     }
     //获取用户信息
     getUserInfo(cb){
-        let that = this
-        let params = {
-            token:getToken()
-        }
-        $.ajax({
-            type:'post',
-            url:baseUrl+'/getfocusUserMessage',
-            data:params,
-            dataType:'json',
-            async:false,
-            success(res){
-                if(res.code===0){
-                    res.data.balance=res.data.balance.toFixed(2)
-                    that.setState({
-                        userInfo:res.data
-                    },()=>{
-                        cb&&cb()
-                    })
-                }
-            },
-            error(err){
-                Toast.info('获取失败',1)
+        if(getToken()){
+            let that = this
+            let params = {
+                token:getToken()
             }
-        })
+            $.ajax({
+                type:'post',
+                url:baseUrl+'/getfocusUserMessage',
+                data:params,
+                dataType:'json',
+                async:false,
+                success(res){
+                    if(res.code===0){
+                        res.data.balance=res.data.balance.toFixed(2)
+                        that.setState({
+                            userInfo:res.data
+                        },()=>{
+                            cb&&cb()
+                        })
+                    }
+                },
+                error(err){
+                    Toast.info('获取失败',1)
+                }
+            })
+        }
     }
     codeImg(){
         let that = this

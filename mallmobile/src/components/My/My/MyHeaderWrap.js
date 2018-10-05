@@ -54,11 +54,11 @@ class MyHeaderWrap extends Component {
                     <div className="my-section">
                         <div className="my-assets">
                             <a onClick={()=>{
-                                // this.props.goto('/my/purse');
-                                // sessionStorage.setItem('__search_prev_path__','/my')
+                                this.props.goto('/my/coupon');
+                                sessionStorage.setItem('__search_prev_path__','/my')
                             }}>
-                                <img src={require('@common/images/all@withe.png')} alt=""/>
-                                <span>我的钱包</span>
+                                <img src={require('@common/images/coupon@.png')} alt=""/>
+                                <span>代金券</span>
                             </a>
                             <a onClick={()=>{
                                 // this.props.goto('/my/purse');

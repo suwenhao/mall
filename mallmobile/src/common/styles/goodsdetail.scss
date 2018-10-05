@@ -4,6 +4,9 @@
         .carousel{
             background: #fff;
             border-bottom:1px solid #eee;
+            .slider-list{
+                height:375px !important;
+            }
             .carousel-item{
                 touch-action:none;
                 display: inline-block;

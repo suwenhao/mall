@@ -124,7 +124,8 @@ class Helpback extends Component {
         <div style={{
             marginTop:'46px'
           }} className="helpback-main">
-          <Tabs tabs={this.state.tabs}
+          <Tabs 
+              tabs={this.state.tabs}
               initialPage={this.state.helpbackIndex}
               tabBarPosition="top"
               renderTab={tab => <span>{tab.title}</span>}

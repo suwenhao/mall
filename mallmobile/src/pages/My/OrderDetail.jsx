@@ -27,6 +27,11 @@ class OrderDetail extends Component {
             success(res){
                 console.log(res)
                 if(res.code == 0){
+                    let totalPrice = 0;
+                    res.data.data.orderItems.forEach(v=>{
+                    totalPrice += (v.price * v.quantity)
+                    })
+                    res.data.data.totalPrice = totalPrice
                     that.setState({
                         order:res.data.data
                     })
@@ -67,7 +72,7 @@ class OrderDetail extends Component {
         let reqType = 1;  //请求类型 1-订单 2-卡券 3-团购 4-充值 5-其他
         let params = {
             token: getToken(),
-            totalFee: this.state.order.orderMoney-this.state.order.discountMoney,
+            totalFee: this.state.order.orderMoney,
             outTradeNo: this.state.orderId,
             reqType: reqType,
             body:''
@@ -94,7 +99,7 @@ class OrderDetail extends Component {
                                 function(res){     
                                     if(res.err_msg == "get_brand_wcpay_request:ok" ) {
                                         Toast.info("支付成功",1);
-                                        that.setShare(that.state.order.orderMoney-that.state.order.discountMoney)
+                                        that.setShare(that.state.order.orderMoney)
                                         that.props.history.push('/my/orderlist')
                                     }else{
                                         that.props.history.push('/my/orderlist')
@@ -356,11 +361,11 @@ class OrderDetail extends Component {
                     </div>
                     <div className="order_total">
                         <ul>
-                            <li>商品总额<span className="price">¥ {this.state.order&&this.state.order.orderMoney.toFixed(2)}</span></li>
+                            <li>商品总额<span className="price">¥ {this.state.order&&this.state.order.totalPrice.toFixed(2)}</span></li>
                             <li>优惠金额<span className="price">- ¥ {this.state.order&&this.state.order.discountMoney.toFixed(2)}</span></li>
                             <li>运费<span className="price">+ ¥ {this.state.order&&this.state.order.freight.toFixed(2)}</span></li>
                         </ul> 
-                        <p className="total">实付金额：<span>¥ {this.state.order&&(this.state.order.orderMoney+this.state.order.freight-this.state.order.discountMoney).toFixed(2)}</span></p>
+                        <p className="total">实付金额：<span>¥ {this.state.order&&(this.state.order.orderMoney+this.state.order.freight).toFixed(2)}</span></p>
                     </div>
                 </div>
                 :<div style={{padding:'10px',textAlign:'center'}}>缺少参数</div>
