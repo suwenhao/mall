@@ -31,6 +31,7 @@ class GoodsDetail extends Component {
       stockNum:null,    //库存
       stockId:null,     //库存id
       popPrice:null,    //商品当前规格价格
+      originalPrice:null,    //商品当前规格原价
       standard:null,    //sku文字
       productName:null,  //商品名称
       productImage:null, //商品图片
@@ -213,12 +214,14 @@ class GoodsDetail extends Component {
     let that = this;
     let stockNum = sku.stockNum;
     let popPrice = sku.price.toFixed(2);
+    let originalPrice = sku.originalPrice.toFixed(2);
     let skuId = sku.id;
     let productName = sku.productName;
     that.setState({
       stockNum: stockNum,
       stockId: skuId,
       popPrice: popPrice,
+      originalPrice: originalPrice,
       standard: '',
       productName: productName,
     })
@@ -356,6 +359,7 @@ class GoodsDetail extends Component {
       let stockNum=0;
       let stockId=null;
       let popPrice=null;
+      let originalPrice = null;
       for(let i in sku){
         let key=false;
         for (let j in sku[i]['skuValues']){
@@ -370,6 +374,7 @@ class GoodsDetail extends Component {
           stockNum=sku[i].stockNum;
           stockId = sku[i].id;
           popPrice = sku[i].price;
+          originalPrice = sku[i].originalPrice;
           break;
         }
       }
@@ -378,7 +383,8 @@ class GoodsDetail extends Component {
         val:1,
         stockId: stockId,
         allBtn: true,
-        popPrice: popPrice.toFixed(2)
+        popPrice: popPrice.toFixed(2),
+        originalPrice: originalPrice.toFixed(2),
       })
     }
   }
@@ -460,6 +466,7 @@ class GoodsDetail extends Component {
               skuStr: that.state.standard,
               productName: that.state.productName,
               productPrice: that.state.popPrice,
+              originalPrice: that.state.originalPrice,
               productImage: that.state.productImage,
               pickupWay: result.pickupWay
           })
@@ -595,7 +602,7 @@ class GoodsDetail extends Component {
           <div className="price-wrap">
               <div className="price">
                 <span><i>￥</i>{this.state.data&&this.state.popPrice}</span>
-                <span>￥{this.state.data&&this.state.data.productPrice.toFixed(2)}</span>
+                <span>原价 <span>￥{this.state.originalPrice}</span></span>
               </div>
               <div className="scoket">
                 库存 <span>{this.state.data&&this.state.stockNum}</span>

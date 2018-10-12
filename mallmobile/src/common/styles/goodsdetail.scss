@@ -108,9 +108,12 @@
                 }
                 >span:nth-child(2){
                     margin: 0 0 0 2px;
-                    text-decoration: line-through;
+                    margin-left:10px;
                     color: #999;
                     font-size: 12px;
+                    span{
+                        text-decoration: line-through;
+                    }
                 }
             }
             .scoket{
