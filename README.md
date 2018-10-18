@@ -3,7 +3,6 @@
 #### 项目介绍
 React开发的手机端商城，使用antd-mobile UI框架
 
-后台模拟用的是koa2，只模拟了取数据，不能修改数据
 
 #### 项目预览
 
@@ -62,9 +61,10 @@ React开发的手机端商城，使用antd-mobile UI框架
     const app = require('./app');
     ```
 3. 两个目录分别npm install 或者 yarn install [npm全局安装了yarn]
-4. 然后在malladmin文件夹node app.js，在mallmobile文件夹npm start或者yarn start 
+4. ，在mallmobile文件夹npm start或者yarn start 
 5. 打开网页
     http://localhost:3000/
 6. 二次开发
     - 在mallmobile文件夹
+    - 没做接口文档
 
