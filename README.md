@@ -3,7 +3,6 @@
 #### 项目介绍
 React开发的手机端商城，使用antd-mobile UI框架
 
-后台模拟用的是koa2，只模拟了取数据，不能修改数据
 
 #### 项目预览
 
@@ -61,10 +60,19 @@ React开发的手机端商城，使用antd-mobile UI框架
     // 应用的其余 require 需要被放到 hook 后面
     const app = require('./app');
     ```
-3. 两个目录分别npm install 或者 yarn install [npm全局安装了yarn]
-4. 然后在malladmin文件夹node app.js，在mallmobile文件夹npm start或者yarn start 
-5. 打开网页
-    http://localhost:3000/
+
+
+## 运行项目 注：在mallmobile
+- 先安装依赖 yarn install
+- 依赖安装完运行 yarn start
+- 项目如果跳转到要微信打开的话就修改common公共资源文件夹里的js文件里的util.js
+- util.js修改
+	- getToken函数里的return 'xxxx' 放开注释,return null注释
+	- getJSsdkParams函数同样如同以上。
+	- xxxx是token
+- 打开http://localhost:3000/
+- 如果看不到效果或者说ajax请求出错等，请在浏览器安装Allow-Control-Allow-Origin插件，这样就支持跨域，重新刷新页面就会有效果了。注：Allow-Control-Allow-Origin插件必须开启
 6. 二次开发
     - 在mallmobile文件夹
+    - 没做接口文档
 
