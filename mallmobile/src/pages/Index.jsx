@@ -33,7 +33,12 @@ class Index extends Component {
         this.getShare()
     }
     getCartNum(){
-        this.props.load.getCartList()
+        let token = getToken()
+        if(token){
+            this.props.load.getCartList()
+        }else{
+            window.location.href = locationHref()
+        }
     }
     getShare(){
         let userId=getQueryString('userId')

@@ -608,8 +608,16 @@ class GoodsDetail extends Component {
                 库存 <span>{this.state.data&&this.state.stockNum}</span>
               </div>
           </div>
-           {/* 价格--> */}
-           <div className="item-list">
+          {
+            this.state.data&&this.state.data.salesPoint?
+            <div className="price-wrap" style={{fontSize:'14px',color:'#333'}}>
+              {this.state.data.salesPoint}
+            </div>
+            :null
+          }
+          
+          {/* 价格--> */}
+          <div className="item-list">
             <h3>选择</h3>
             <div className="item-content">
               {this.state.standard}

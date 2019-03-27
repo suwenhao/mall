@@ -4,7 +4,7 @@ import { Button, Toast, Picker, List, TextareaItem, Modal } from 'antd-mobile'
 import TextHeader from '@components/Header/TextHeader'
 import _ from 'underscore'
 import $ from 'jquery'
-import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
+import {baseUrl,getToken} from '@common/js/util.js'
 import Loading from '@base/Loading'
 import '@common/styles/orderdetail.scss'
 import axios from 'axios'
@@ -20,6 +20,7 @@ class Order extends Component {
         orderId:null,
         addr:null,
         memo:'',
+        freight:0,
         presetArr:[
           {
             label:'快递',
@@ -103,8 +104,58 @@ class Order extends Component {
       cb && cb(data.data.data);
     })()
   }
+  //获取运费
+  getFreight(){
+    let that = this
+    let params = {}
+    $.ajax({
+      type:'get',
+      data:params,
+      url:baseUrl+'/publicFreight/getPublicFreight',
+      success(res){
+          console.log(res)
+          if(res.code === 0){
+            let publicFreight = res.data.publicFreight
+            let totalPrice=that.state.orderInfo.totalPrice;
+            let addrId = that.state.addr.provinceId
+            if (addrId==="440000"){
+              if (totalPrice > publicFreight.internalAmount){
+                that.setState({
+                  freight:0
+                })
+              }else{
+                that.setState({
+                  freight: publicFreight.insideFreight
+                })
+              }
+            }else{
+              if (totalPrice > publicFreight.outsourcedAmount) {
+                that.setState({
+                  freight: 0
+                })
+              }else{
+                that.setState({
+                  freight: publicFreight.outsideFreight
+                })
+              }
+            }
+          }else{
+              Toast.info(res.message,1);
+              this.setState({
+                loading: false
+              })
+          }
+      },
+      error(){
+        Toast.info('请求出错',1);
+        this.setState({
+          loading: false
+        })
+      }
+    })
+  }
   //设置显示的地址
-  setAddress(){
+  setAddress(cb){
     var that=this;
     var addr=this.props.location.query?this.props.location.query.addr:false;
     if (!addr){
@@ -114,6 +165,8 @@ class Order extends Component {
             })
             this.setState({
               addr:data[index]
+            },()=>{
+              cb&&cb()
             })
         });
     }else{
@@ -125,12 +178,16 @@ class Order extends Component {
                 })
                 this.setState({
                   addr:data[index]
+                },()=>{
+                  cb&&cb()
                 })
             });
         }else{
             that.getAddressList();
             this.setState({
               addr:JSON.parse(address)
+            },()=>{
+              cb&&cb()
             })
         }
     }
@@ -327,7 +384,9 @@ class Order extends Component {
   }
   componentDidMount(){
     this.getOrderInfo(()=>{
-      this.setAddress();
+      this.setAddress(()=>{
+        this.getFreight()
+      });
       this.getCouponList();
     });
     console.log(this.props)
@@ -500,9 +559,9 @@ class Order extends Component {
                         <ul>
                             <li>商品金额<span className="price">¥ {this.state.orderInfo&&this.state.orderInfo.totalPrice}</span></li>
                             <li>代金券<span className="price">- ¥ {this.state.coupon?this.state.coupon.faceValue.toFixed(2):'0.00'}</span></li>
-                            <li>运费<span className="price">+ ¥ 0.00</span></li>
+                            <li>运费<span className="price">+ ¥ {this.state.freight.toFixed(2)}</span></li>
                         </ul> 
-                        <p className="total">总价：<span>¥ {this.state.orderInfo&&(this.state.orderInfo.totalPrice-(this.state.coupon?this.state.coupon.faceValue:0.00)).toFixed(2)}</span></p>
+                        <p className="total">总价：<span>¥ {this.state.orderInfo&&(this.state.orderInfo.totalPrice-(this.state.coupon?this.state.coupon.faceValue:0.00)+this.state.freight).toFixed(2)}</span></p>
                     </div>
                     <div className="section">
                       <Button type="primary" onClick={()=>{
