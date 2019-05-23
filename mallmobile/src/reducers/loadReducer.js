@@ -1,7 +1,6 @@
-import {LOADCATE,SETCARTNUM} from '@types/loadType'
+import {LOADCATE} from '@types/loadType'
 const initState={
-    cates:[],
-    cartNum:0,
+    cates:[]
 }
 export default (state=initState,action)=>{
     switch(action.type){
@@ -9,11 +8,6 @@ export default (state=initState,action)=>{
             return {
                 ...state,
                 cates:action.cates
-            }
-        case SETCARTNUM:
-            return {
-                ...state,
-                cartNum:action.num
             }
         default:
             return state

@@ -3,7 +3,6 @@
         .myfeedback-item{
             padding:10px;
             background-color: #fff;
-            border-bottom:1px solid #eee;
             button{
                 height:34px;
                 line-height: 34px;
@@ -15,11 +14,6 @@
             }
             .body{
                 padding:10px 0;
-                p,h1,h2,h3,h4,li,ul,a,i,img{
-                    margin:0;
-                    padding:0;
-                    font-style: normal;
-                }
             }
             .time{
                 font-size:12px;
@@ -27,11 +21,4 @@
             }
         }
     }
-}
-.order-tip{
-    display: flex;
-    align-items:center;
-    justify-content: center;
-    min-height: 60px;
-    color:#555;
 }

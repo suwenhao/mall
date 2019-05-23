@@ -60,7 +60,6 @@ ul, li {
         .filter{
             background-color: #fff;
             display: flex;
-            border-bottom:1px solid #eee;
             .filter-item{
                 line-height:24px;
                 height:24px;
@@ -76,12 +75,9 @@ ul, li {
                     display: block;
                 }
             }
-            .selected{
-                color: #e93b3d;
-            }
         }
         .search-list{
-            // border-top:1px solid #eee;
+            border-top:1px solid #eee;
             .search-item{
                 display: block;
                 position: relative;
@@ -314,12 +310,4 @@ ul, li {
             display: block;
         }
     }
-}
-.am-checkbox{
-    margin-top: -3px;
-    margin-right:10px;
-}
-.nodata{
-    line-height: 80px;
-    text-align: center;
 }
