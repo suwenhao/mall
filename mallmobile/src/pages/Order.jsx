@@ -81,7 +81,7 @@ class Order extends Component {
     (async ()=>{
       let params = { token: this.state.token}
       let {data} = await axios.get('/api/alliance/listAddress').then(res=>res);
-      console.log(data)
+      console.log(data, params)
       this.setState({
         addressList:data.data,
         loading:false
@@ -180,7 +180,7 @@ class Order extends Component {
                               return (
                                 <div key={i} className="goods-item">
                                   <div className="goods-cover">
-                                      <img src="http://img10.360buyimg.com/n2/jfs/t18046/308/1462286824/185242/64c962d9/5acaf911N16a15a39.jpg.dpg"/>
+                                      <img alt="" src="http://img10.360buyimg.com/n2/jfs/t18046/308/1462286824/185242/64c962d9/5acaf911N16a15a39.jpg.dpg"/>
                                   </div>
                                   <div className="goods-cont">
                                       <div className="goods-info">

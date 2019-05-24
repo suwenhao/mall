@@ -33,9 +33,8 @@
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 2;
-         /* autoprefixer: off */
+        /*! autoprefixer: ignore next */
         -webkit-box-orient: vertical;
-         /* autoprefixer: on */
         color: #232326;
         margin-top: 5px;
         line-height: 17px;

@@ -55,8 +55,10 @@
                         line-height:18px;
                         overflow: hidden;
                         line-clamp: 1;
-                        box-orient: vertical;
-                        display: box;
+                        /*! autoprefixer: ignore next */
+                        -webket-box-orient: vertical;
+                        /*! autoprefixer: ignore next */
+                        display: -webket-box;
                     }
                     .item-img{
                         margin: 0 auto;

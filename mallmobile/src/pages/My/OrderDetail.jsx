@@ -70,7 +70,7 @@ class OrderDetail extends Component {
                         <div className="order-goods">
                             <div className="goods-item">
                                 <div className="goods-cover">
-                                    <img src="http://img10.360buyimg.com/n2/jfs/t18046/308/1462286824/185242/64c962d9/5acaf911N16a15a39.jpg.dpg"/>
+                                    <img src="http://img10.360buyimg.com/n2/jfs/t18046/308/1462286824/185242/64c962d9/5acaf911N16a15a39.jpg.dpg" alt="" />
                                 </div>
                                 <div className="goods-cont">
                                     <div className="goods-info">

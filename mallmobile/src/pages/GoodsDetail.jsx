@@ -168,6 +168,7 @@ class GoodsDetail extends Component {
     for (let i = 0; i < sku.length; i++) {
       var specSubArr=[];//规格值
       var skuId = sku[i].id;  //库存id
+      console.log(skuId)
       for (let j = 0; j < sku[i].skuValues.length;j++){
         specSubArr.push({
           value:sku[i].skuValues[j].specificationValue,
@@ -209,7 +210,7 @@ class GoodsDetail extends Component {
     for (let i in data){
       let key = false;
       for(let j in data[i]){
-        if (data[i][j].key=='1'){
+        if (data[i][j].key==='1'){
           key = data[i][j].text;
           break;
         }
@@ -245,7 +246,7 @@ class GoodsDetail extends Component {
     for (let i in data) {
       let key = false;
       for (let j in data[i]) {
-        if (data[i][j].key == '1') {
+        if (data[i][j].key === '1') {
           spcount++;
           key = data[i][j].text;
           codeArr.push(data[i][j].code);
@@ -264,14 +265,14 @@ class GoodsDetail extends Component {
       spcount: spcount,
       standard: standardText
     })
-    if (spcount == specCount){
+    if (spcount === specCount){
       let stockNum=0;
       let stockId=null;
       let popPrice=null;
       for(let i in sku){
         let key=false;
         for (let j in sku[i]['skuValues']){
-          if (sku[i]['skuValues'][j].specificationCode==codeArr[j]){
+          if (sku[i]['skuValues'][j].specificationCode===codeArr[j]){
             key=true;
           }else{
             key=false;
@@ -331,6 +332,7 @@ class GoodsDetail extends Component {
           this.props.history.push({
             pathname:'/order'
           })
+          console.log(url, params)
         }
       } else {
         Toast.info('请选择规格',1);
@@ -387,6 +389,7 @@ class GoodsDetail extends Component {
   render() {
     let prevPath = sessionStorage.getItem('__search_prev_path__')
     let goodsPrevPath = sessionStorage.getItem('__goods_prev_path__')
+    console.log(prevPath)
     return (
       <div className="goods-page">
         {

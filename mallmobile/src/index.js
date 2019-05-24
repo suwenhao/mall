@@ -17,13 +17,14 @@ var devTools=window.devToolsExtension?window.devToolsExtension():null
 //     applyMiddleware(thunk,logger),
 //     devTools
 // ))
+var store;
 if(window.devToolsExtension){
-    var store = createStore(reducer,compose(
+    store = createStore(reducer,compose(
         applyMiddleware(thunk,logger),
         devTools
     ))
 }else{
-    var store = createStore(reducer,compose(
+    store = createStore(reducer,compose(
         applyMiddleware(thunk,logger)
     ))
 }

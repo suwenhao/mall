@@ -100,10 +100,8 @@ class AddressAdd extends Component {
                       cols={this.state.cols}
                       value={[this.state.provinceActive.value]}
                       onPickerChange={(v)=>{
-                        let prov = this.state.provinces.filter((item)=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                        let prov = this.state.provinces.filter((item) => {
+                          return v[0] === item.id
                         })
                         this.setState({
                           provinceActive:prov[0]
@@ -112,9 +110,7 @@ class AddressAdd extends Component {
                       }}
                       onOk={v => {
                         let prov = this.state.provinces.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         console.log(prov)
                         this.setState({
@@ -145,9 +141,7 @@ class AddressAdd extends Component {
                       onPickerChange={(v)=>{
                         console.log(v)
                         let prov = this.state.citys.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         this.setState({
                           cityActive:prov[0]
@@ -156,9 +150,7 @@ class AddressAdd extends Component {
                       }}
                       onOk={v => {
                         let prov = this.state.citys.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         console.log(prov)
                         this.setState({
@@ -186,9 +178,7 @@ class AddressAdd extends Component {
                       onPickerChange={(v)=>{
                         console.log(v)
                         let prov = this.state.areas.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         this.setState({
                           areaActive:prov[0]
@@ -197,9 +187,7 @@ class AddressAdd extends Component {
                       }}
                       onOk={v => {
                         let prov = this.state.areas.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         console.log(prov)
                         this.setState({

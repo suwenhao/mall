@@ -120,9 +120,8 @@
                         overflow : hidden;
                         text-overflow: ellipsis;
                         display: -webkit-box;
-                        /* autoprefixer: off */
+                        /*! autoprefixer: ignore next */
                         -webkit-box-orient: vertical;
-                        /* autoprefixer: on */
                         white-space:inherit;
                         -webkit-line-clamp: 2;
                     }

@@ -109,9 +109,7 @@ class Cart extends Component {
     }
     delete(){
         let deleteData = this.state.data.filter(v=>{
-            if(v.check){
-                return v
-            }
+            return v.check === true
         })
         console.log(deleteData)
     }
