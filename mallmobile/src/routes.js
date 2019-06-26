@@ -1,19 +1,17 @@
 import React, { Component } from 'react'
+import AuthRoute from '@/components/AuthRoute'
 import {Route,Switch} from 'react-router-dom'
 
 import Login from '@/pages/Login.jsx'
 import Register from '@/pages/Register.jsx'
 import NotFount from '@/pages/NotFount.jsx'
 import Index from '@/pages/Index.jsx'
-import VConsole from 'vconsole'
 
 class Routes extends Component {
-    componentDidMount(){
-        //let vc = new VConsole();
-    }
     render(){
         return (
             <div style={{height:"100%",overflow: 'hidden'}}>
+                <AuthRoute></AuthRoute>
                 <Switch>
                     <Route path='/login' component={Login}></Route>
                     <Route path='/register' component={Register}></Route>

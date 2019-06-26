@@ -16,8 +16,6 @@ class CratList extends Component{
                                 this.props.changeStock(id,val)
                             }} checkChange={(id,val)=>{
                                 this.props.checkChange(id,val)
-                            }} getCartList={()=>{
-                                this.props.getCartList()
                             }} key={i} item={item}></CartItem>
                         )
                     })

@@ -3,8 +3,6 @@ import {connect} from 'react-redux'
 import { Button, TextareaItem, WingBlank, WhiteSpace, Picker, Toast } from 'antd-mobile'
 import TextHeader from '@components/Header/TextHeader'
 import axios from 'axios'
-import {baseUrl,imgUrl,getToken} from '@common/js/util.js'
-import $ from 'jquery'
 
 import '@common/styles/addressadd.scss'
 
@@ -32,7 +30,7 @@ class AddressAdd extends Component {
     }
   }
   componentDidMount(){
-    this.getAddressArea('',1,'provinces')
+    this.getAddressArea(null,1,'provinces')
   }
   getAddressArea(parentId,level,type,cb){
     (async ()=>{
@@ -40,12 +38,12 @@ class AddressAdd extends Component {
         parentId:parentId,
         level:level
       }
-      let {data} = await axios.get(baseUrl+'/area/list',{
+      let {data} = await axios.get('/api/alliance/areaList',{
         params:params
       }).then(res=>res);
       console.log(data)
       this.setState({
-        [type]:data.data.data.map(item=>{
+        [type]:data.data.map(item=>{
           return {
             ...item,
             value:item.id,
@@ -57,7 +55,6 @@ class AddressAdd extends Component {
     })()
   }
   submit(){
-    let that = this;
     let myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
     if (this.state.name === "") {
       Toast.info("请填写收货人");
@@ -74,32 +71,7 @@ class AddressAdd extends Component {
     } else if (this.state.address === "") {
       Toast.info("请填写详细地址");
     } else {
-      var params = {
-          token: getToken(),
-          provinceId: parseInt(this.state.provinceDefault.id),
-          cityId: parseInt(this.state.cityDefault.id),
-          countyId: parseInt(this.state.areaDefault.id),
-          address: this.state.address,
-          phone: parseInt(this.state.phone),
-          consignee: this.state.name,
-          isDefault: true
-      };
-      params.provinceName = this.state.provinceDefault.cname;
-      params.cityName = this.state.cityDefault.cname;
-      params.countyName = this.state.areaDefault.cname;
-      console.log(params)
-      $.ajax({
-        type:'post',
-        data:params,
-        url:baseUrl+'/address/add',
-        success(res){
-            console.log(res)
-            that.props.history.push('/my/address')
-        },
-        error(){
-            Toast.info('新增失败',1);
-        }
-    })
+      
     }
   }
   render() {
@@ -128,10 +100,8 @@ class AddressAdd extends Component {
                       cols={this.state.cols}
                       value={[this.state.provinceActive.value]}
                       onPickerChange={(v)=>{
-                        let prov = this.state.provinces.filter((item)=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                        let prov = this.state.provinces.filter((item) => {
+                          return v[0] === item.id
                         })
                         this.setState({
                           provinceActive:prov[0]
@@ -140,9 +110,7 @@ class AddressAdd extends Component {
                       }}
                       onOk={v => {
                         let prov = this.state.provinces.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         console.log(prov)
                         this.setState({
@@ -173,9 +141,7 @@ class AddressAdd extends Component {
                       onPickerChange={(v)=>{
                         console.log(v)
                         let prov = this.state.citys.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         this.setState({
                           cityActive:prov[0]
@@ -184,9 +150,7 @@ class AddressAdd extends Component {
                       }}
                       onOk={v => {
                         let prov = this.state.citys.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         console.log(prov)
                         this.setState({
@@ -214,9 +178,7 @@ class AddressAdd extends Component {
                       onPickerChange={(v)=>{
                         console.log(v)
                         let prov = this.state.areas.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         this.setState({
                           areaActive:prov[0]
@@ -225,9 +187,7 @@ class AddressAdd extends Component {
                       }}
                       onOk={v => {
                         let prov = this.state.areas.filter(item=>{
-                            if(v[0]===item.id){
-                              return item
-                            }
+                          return v[0] === item.id
                         })
                         console.log(prov)
                         this.setState({
@@ -247,7 +207,6 @@ class AddressAdd extends Component {
                     <TextareaItem rows="3" placeholder="详细地址需填写楼栋楼层或房间号信息" value={this.state.address} onChange={(val)=>{this.setState({address:val})}}></TextareaItem>
                   </label>
                 </div>
-                <div style={{color:'#555',fontSize:'12px',margin:'10px'}}>详细地址需填写楼栋楼层或房间号信息</div>
                 <WhiteSpace/>
                 <WingBlank>
                   <Button type="primary" onClick={()=>{

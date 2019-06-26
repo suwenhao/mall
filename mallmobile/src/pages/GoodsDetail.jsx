@@ -1,48 +1,37 @@
 import React, { Component } from 'react'
-//头部
+import {connect} from 'react-redux'
 import Header from '@components/Header/Header'
-//组件
 import {Carousel,Stepper,Toast} from 'antd-mobile'
-//页面css
 import '@common/styles/goodsdetail.scss'
-//图片预览器组件
+import 'react-photoswipe/lib/photoswipe.css'
 import {PhotoSwipe} from 'react-photoswipe'
-//公共功能
-import {unique,baseUrl,imgUrl,getToken} from '@common/js/util.js'
-//加载中组件
+import {unique} from '@common/js/util.js'
 import Loading from '@base/Loading'
-//classnames插件
 import classnames from 'classnames'
-//jquery
+import axios from 'axios'
 import $ from 'jquery'
-//评论组件
-import Comments from '@components/GoodsDetail/Comments'
 
 class GoodsDetail extends Component {
-  //构造函数
   constructor(props){
     super(props);
     this.state = {
-      loading:true, //控制加载中显示
-      data: null,   //商品数据
-      val: 1,       //商品数量
-      sku:null,     //sku 
-      goodId:props.match.params.id,  //商品id
-      stockNum:null,    //库存
-      stockId:null,     //库存id
-      popPrice:null,    //商品当前规格价格
-      originalPrice:null,    //商品当前规格原价
-      standard:null,    //sku文字
-      productName:null,  //商品名称
-      productImage:null, //商品图片
-      productPrice:null, //商品价格
-      introduction:"",   //商品详情
-      specCount:null,   
+      loading:true,
+      data: null,
+      val: 1,
+      sku:null,
+      token:null,
+      goodId:props.match.params.id,
+      stockNum:null,
+      stockId:null,
+      popPrice:null,
+      standard:null,
+      productName:null,
+      productImage:null,
+      specCount:null,
       specData:null,
       specNameArr:null,
       spcount:null,
       allBtn:true,
-      cartListNum:[],
       style:{
         height:'auto',
         width:'auto'
@@ -51,17 +40,16 @@ class GoodsDetail extends Component {
         width:'5px',
         height:'5px'
       },
-      isOpen:false,  //图片预览开关
-      //图片预览设置
+      isOpen:false,
       options:{
         index: 0,
         escKey: true,
         shareEl: false,
-        history:false,
         shareButtons:[]
-      },
+      }
     }
   }
+
   //计算窗口宽高
   calcWindow(){
     return {
@@ -88,9 +76,11 @@ class GoodsDetail extends Component {
   }
   //计算图片宽高
   calcImg(ev,i){
-    let picobjs=this.state.data.picobjs.concat();
-    picobjs[i].w=ev.currentTarget.width
-    picobjs[i].h=ev.currentTarget.height
+    let picobjs=this.state.data.picobjs.concat()
+    let item=picobjs[i];
+    item.w=ev.currentTarget.width;
+    item.h=ev.currentTarget.height;
+    picobjs[i]=item;
     this.setState({
       data:{
         ...this.state.data,
@@ -98,115 +88,36 @@ class GoodsDetail extends Component {
       }
     })
   }
-  //获取购物车列表
-  getCartList(){
-      let that = this
-      $.ajax({
-          type:'get',
-          data:{
-              token:getToken()
-          },
-          url:baseUrl+'/cart/getCart',
-          success(res){
-              console.log(res)
-              let cartListNum=0;
-              res.data.data.forEach(item => {
-                cartListNum+=item.quantity
-              });
-              that.setState({
-                cartListNum:cartListNum
-              })
-          }
-      })
-  }
-  //获取商品信息详情
-  getGoodsDetail(){
-    let that = this
-    let params = {
-      goodId:this.state.goodId
-    }
-    $.ajax({
-      type:'get',
-      data:params,
-      url:baseUrl+'/goodDetail',
-      success(res){
-        // console.log(res.data.data)
-        if(res.code===0){
-          if(res.data.data){
-            that.setState({
-              introduction:res.data.data.introduction
-            })
-          }
-        }
-      },
-      error(){
-        that.setState({
-          loading:false
-        })
-      }
-    })
-  }
   //获取商品信息
   getGoodsInfo(){
-    let that = this
-    let params = {
-      goodId:this.state.goodId,
-      token:getToken()
-    }
-    $.ajax({
-      type:'get',
-      data:params,
-      url:baseUrl+'/goodsInfo',
-      success(res){
-        if(res.code===0){
-          let data = res.data
-          data.productImage = imgUrl+ data.productImage; 
-          //组合图片数组
-          let pictures = []
-          //有详细图片时
-          if (data.pictures) {
-              if(data.pictures.charAt(0)===','){
-                pictures = data.pictures.substring(1).split(',')
-              }else{
-                pictures = data.pictures.split(',')
-              }
-              for (var i in pictures) {
-                  pictures[i] = imgUrl + pictures[i]
-              }
-              pictures.unshift(data.productImage)
+    (async ()=>{
+      let res = await axios.get('/api/alliance/goodInfo').then(res=>res);
+      let {data} = res.data
+      data.productImage = 'images/test/'+ data.productImage; 
+      let pictures = []
+      //渲染数据
+      if (data.pictures) {
+          pictures = data.pictures.split(',')
+          for (var i in pictures) {
+              pictures[i] = 'images/test/' + pictures[i]
           }
-          //没有详细图片时放入封面图片
-          if (pictures.length < 1) {
-              pictures.push(data.productImage)
-          }
-          //构建图片预览器需要的数据
-          let picobjs=pictures.map(v=>{
-            return {
-              src:v,w:500,h:500
-            }
-          })
-          data.picobjs=picobjs
-          //更新model
-          that.setState({
-            data,
-            loading:false
-          })
-          //构建规格
-          that.filterData(data)
-          that.getCartList()
-        }else{
-          Toast.info('暂无此商品',1)
-          setTimeout(()=>{
-            that.props.history.push('/')
-          },1000)
-        }
-      },
-      error(){
-        that.setState({
-          loading:false
-        })
+          pictures.unshift(data.productImage)
       }
-    })
+      if (pictures.length < 1) {
+          pictures.push(data.productImage)
+      }
+      let picobj=pictures.map(v=>{
+        return {
+          src:require(`@common/${v}`)
+        }
+      })
+      data.picobjs=picobj
+      this.setState({
+        data,
+        loading:false
+      })
+      this.filterData(data)
+    })()
   }
   //设置初始
   setAllDataStandard(sku){
@@ -214,14 +125,12 @@ class GoodsDetail extends Component {
     let that = this;
     let stockNum = sku.stockNum;
     let popPrice = sku.price.toFixed(2);
-    let originalPrice = sku.originalPrice.toFixed(2);
     let skuId = sku.id;
     let productName = sku.productName;
     that.setState({
       stockNum: stockNum,
       stockId: skuId,
       popPrice: popPrice,
-      originalPrice: originalPrice,
       standard: '',
       productName: productName,
     })
@@ -259,6 +168,7 @@ class GoodsDetail extends Component {
     for (let i = 0; i < sku.length; i++) {
       var specSubArr=[];//规格值
       var skuId = sku[i].id;  //库存id
+      console.log(skuId)
       for (let j = 0; j < sku[i].skuValues.length;j++){
         specSubArr.push({
           value:sku[i].skuValues[j].specificationValue,
@@ -300,7 +210,7 @@ class GoodsDetail extends Component {
     for (let i in data){
       let key = false;
       for(let j in data[i]){
-        if (data[i][j].key=='1'){
+        if (data[i][j].key==='1'){
           key = data[i][j].text;
           break;
         }
@@ -336,7 +246,7 @@ class GoodsDetail extends Component {
     for (let i in data) {
       let key = false;
       for (let j in data[i]) {
-        if (data[i][j].key == '1') {
+        if (data[i][j].key === '1') {
           spcount++;
           key = data[i][j].text;
           codeArr.push(data[i][j].code);
@@ -355,15 +265,14 @@ class GoodsDetail extends Component {
       spcount: spcount,
       standard: standardText
     })
-    if (spcount == specCount){
+    if (spcount === specCount){
       let stockNum=0;
       let stockId=null;
       let popPrice=null;
-      let originalPrice = null;
       for(let i in sku){
         let key=false;
         for (let j in sku[i]['skuValues']){
-          if (sku[i]['skuValues'][j].specificationCode==codeArr[j]){
+          if (sku[i]['skuValues'][j].specificationCode===codeArr[j]){
             key=true;
           }else{
             key=false;
@@ -374,7 +283,6 @@ class GoodsDetail extends Component {
           stockNum=sku[i].stockNum;
           stockId = sku[i].id;
           popPrice = sku[i].price;
-          originalPrice = sku[i].originalPrice;
           break;
         }
       }
@@ -383,8 +291,7 @@ class GoodsDetail extends Component {
         val:1,
         stockId: stockId,
         allBtn: true,
-        popPrice: popPrice.toFixed(2),
-        originalPrice: originalPrice.toFixed(2),
+        popPrice: popPrice
       })
     }
   }
@@ -415,25 +322,17 @@ class GoodsDetail extends Component {
         if (this.state.val > stockNum) {
           Toast.info('库存不足',1);
         } else {
-            let params = {
-              token: getToken(),
-              productId: that.state.goodId,
-              quantity: this.state.val,
-              skuId: that.state.stockId
-            }
-            $.ajax({
-              type:"get",
-              url:baseUrl+'/cart/addCart',//添加自己的接口链接
-              data:params,
-              dataType:'json',
-              success(res){
-                  Toast.info('加入购物车成功',1)
-                  that.getCartList()
-              },
-              error(err){
-                  Toast.info('加入购物车失败',1)
-              }
-            })
+          let url = '/alliance/cart/addCart'
+          let params = {
+            token: that.state.token,
+            productId: that.state.goodId,
+            quantity: this.state.val,
+            skuId: that.state.stockId
+          }
+          this.props.history.push({
+            pathname:'/order'
+          })
+          console.log(url, params)
         }
       } else {
         Toast.info('请选择规格',1);
@@ -441,7 +340,7 @@ class GoodsDetail extends Component {
     }
   }
   //购买
-  buyImmediately(){
+  buyImmediately(val){
     //点击立刻购买
     var that = this;
     var allBtn = that.state.allBtn;
@@ -454,9 +353,7 @@ class GoodsDetail extends Component {
         if (that.state.val > that.state.stockNum) {
           Toast.info('库存不足',1);
         } else {
-          //现在的思路是每次点击规格的时候就把规格参数记录起来，
-          //然后再点击立即购买的时候拿出数据，
-          //转跳界面的时候需要清除数据
+          //现在的思路是每次点击规格的时候就把规格参数记录起来，然后再点击立即购买的时候拿出数据，转跳界面的时候需要清除数据
           var allData = {};
           allData['items']=[]
           allData['items'].push({
@@ -466,7 +363,6 @@ class GoodsDetail extends Component {
               skuStr: that.state.standard,
               productName: that.state.productName,
               productPrice: that.state.popPrice,
-              originalPrice: that.state.originalPrice,
               productImage: that.state.productImage,
               pickupWay: result.pickupWay
           })
@@ -489,11 +385,11 @@ class GoodsDetail extends Component {
       self.resize()
     })
     this.getGoodsInfo()
-    this.getGoodsDetail()
   }
   render() {
     let prevPath = sessionStorage.getItem('__search_prev_path__')
     let goodsPrevPath = sessionStorage.getItem('__goods_prev_path__')
+    console.log(prevPath)
     return (
       <div className="goods-page">
         {
@@ -502,37 +398,9 @@ class GoodsDetail extends Component {
           :null
         }
         {/* <-头部 */}
-        <div style={{
-          position:'fixed',
-          top:0,
-          left:0,
-          width:'100%',
-          zIndex:1000
-        }}>
-          <Header returnbtn={true} title="商品详情" pathname={goodsPrevPath||'/'}></Header>
-        </div> 
+        <Header returnbtn={true} title="商品详情" pathname={goodsPrevPath||'/'}></Header>
         {/* 头部-> */}
         {/* <-body */}
-        {
-        this.state.loading?
-        null
-        :
-          <div className="cart-icon" onClick={()=>{
-            sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
-            this.props.history.push('/cart')
-          }}>
-            {
-              this.state.cartListNum>0?
-              <span>{this.state.cartListNum}</span>
-              :null
-            }
-            <img src={require(`@common/images/cart_w.png`)} alt=""/>
-          </div>
-        }
-        <div style={{
-          height:'46px',
-          width:'100%'
-        }}></div>
         {
         this.state.loading?
         <Loading/>
@@ -552,7 +420,7 @@ class GoodsDetail extends Component {
           >
              {  
               this.state.data.picobjs.map((val,i) => (
-                  <div
+                  <a
                     className="carousel-item"
                     key={i}
                     style={this.state.style}
@@ -576,7 +444,7 @@ class GoodsDetail extends Component {
                         })
                       }}
                     />
-                  </div>
+                  </a>
                 ))
               }
           </Carousel>
@@ -589,9 +457,9 @@ class GoodsDetail extends Component {
                 <div className="goods-title">
                 {this.state.data&&this.state.data.productName}
                 </div>
-                {/* <div className="goods-favour">
+                <div className="goods-favour">
                   收藏
-                </div> */}
+                </div>
               </div>
               <div className="goods-desc">
               {this.state.data&&this.state.data.desc}
@@ -602,22 +470,14 @@ class GoodsDetail extends Component {
           <div className="price-wrap">
               <div className="price">
                 <span><i>￥</i>{this.state.data&&this.state.popPrice}</span>
-                <span>原价 <span>￥{this.state.originalPrice}</span></span>
+                <span>￥{this.state.data&&this.state.data.originaPrice}</span>
               </div>
               <div className="scoket">
                 库存 <span>{this.state.data&&this.state.stockNum}</span>
               </div>
           </div>
-          {
-            this.state.data&&this.state.data.salesPoint?
-            <div className="price-wrap" style={{fontSize:'14px',color:'#333'}}>
-              {this.state.data.salesPoint}
-            </div>
-            :null
-          }
-          
-          {/* 价格--> */}
-          <div className="item-list">
+           {/* 价格--> */}
+           <div className="item-list">
             <h3>选择</h3>
             <div className="item-content">
               {this.state.standard}
@@ -675,34 +535,19 @@ class GoodsDetail extends Component {
           </div>
           {/* 规格--> */}
           <div className="info-wrap">
-            <div className="info-header comment">
-              <span>
-                评论
-              </span>
-              {/* <span>
-                <img src={require('@common/images/next.png')} alt=""/>
-              </span> */}
-            </div>
-            <Comments commentTotal={this.state.data&&this.state.data.commentTotal} goodId={parseInt(this.state.goodId)}/>
-          </div>
-          <div className="info-wrap">
             <div className="info-header">商品详情</div>
-            <div className="info-body" dangerouslySetInnerHTML = {{ __html:this.state.introduction!==""?this.state.introduction:"暂无商品详情" }}>
+            <div className="info-body" dangerouslySetInnerHTML = {{ __html:this.state.data&&this.state.data.introduction }}>
             </div>
           </div>
         </div>
         }
         {/* body-> */}
         <div className="fixed-btns">
-          <div className="icon" onClick={()=>{
-            window.location.href="tel:13726686145"
-          }}>
-              <img src={require(`@common/images/msg@default.png`)} alt="客服"/>
-              <span>客服</span>
+          <div className="icon">
+            <img src={require(`@common/images/msg@default.png`)} alt="客服"/>
+            <span>客服</span>
           </div>
-          <button className="btn-orange" onClick={()=>{
-            this.addGoodOrCart()
-          }}>加入购物车</button>
+          <button className="btn-orange">加入购物车</button>
           <button onClick={()=>{
             this.buyImmediately()
           }}>购买</button>
@@ -711,4 +556,4 @@ class GoodsDetail extends Component {
     )
   }
 }
-export default GoodsDetail
+export default connect()(GoodsDetail)

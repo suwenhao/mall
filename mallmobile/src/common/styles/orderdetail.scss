@@ -26,9 +26,8 @@
                         text-overflow: ellipsis;
                         display: -webkit-box;
                         -webkit-line-clamp: 2;
-                        /* autoprefixer: off */
+                        /*! autoprefixer: ignore next */
                         -webkit-box-orient: vertical;
-                        /* autoprefixer: on */
                     }
                 }
                 .next{
@@ -103,9 +102,8 @@
                                     text-overflow: ellipsis;
                                     display: -webkit-box;
                                     -webkit-line-clamp: 2;
-                                    /* autoprefixer: off */
+                                    /*! autoprefixer: ignore next */
                                     -webkit-box-orient: vertical;
-                                    /* autoprefixer: on */
                                     font-size: 14px;
                                     line-height: 21px;
                                     color: #333;
@@ -168,8 +166,4 @@
 }
 .am-list-item .am-list-line .am-list-extra{
     font-size:14px;
-}
-.listitem .am-list-content{
-    display: flex;
-    justify-content: space-between;
 }

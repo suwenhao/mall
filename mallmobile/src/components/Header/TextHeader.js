@@ -21,21 +21,13 @@ class TextHeader extends Component {
         pathname:PropTypes.string.isRequired,
     }
     //返回到某页
-    returnPage(callback){
-        let that = this
-        if(callback){
-            callback(back.bind(this))
+    returnPage(){
+        if(this.props.pathname===this.props.location.pathname){
+            this.props.history.push('/')
+            sessionStorage.setItem('__search_prev_path__','/')
         }else{
-            back.call(this)
-        }
-        function back(){
-            if(this.props.pathname===this.props.location.pathname){
-                this.props.history.push('/')
-                sessionStorage.setItem('__search_prev_path__','/')
-            }else{
-                this.props.history.push(this.props.pathname||'/')
-                sessionStorage.setItem('__search_prev_path__',this.props.pathname||'/')
-            }
+            this.props.history.push(this.props.pathname||'/')
+            sessionStorage.setItem('__search_prev_path__',this.props.pathname||'/')
         }
     }
     render() {
@@ -46,7 +38,7 @@ class TextHeader extends Component {
                 this.props.returnbtn?
                 <div className="left" onClick={()=>{
                     //返回到某页
-                    this.returnPage(this.props.callback)
+                    this.returnPage()
                 }}>
                     <img src={require("@common/images/return.png")} alt="return"/>
                 </div>

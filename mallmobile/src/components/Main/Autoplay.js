@@ -1,8 +1,6 @@
 import React, {Component} from 'react'
 import PropTypes from 'proptypes'
-import {withRouter} from 'react-router-dom'
 import {Carousel} from 'antd-mobile'
-import {imgUrl} from '@common/js/util.js'
 
 class Autoplay extends Component {
     static propTypes = {
@@ -22,39 +20,30 @@ class Autoplay extends Component {
     render() {
         return (
             <Carousel
-                autoplay={true}
+                autoplay={false}
                 infinite
                 beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
                 afterChange={index => console.log('slide to', index)}
             >
-                {this.props.data.map((item,i) =>{
-                    return (
-                        <a
-                            key={i}
-                            onClick={()=>{
-                                if(item.type===1){
-                                    this.props.history.push('/goods/'+item.target)
-                                    sessionStorage.setItem('__search_prev_path__',this.props.location.pathname)
-                                    sessionStorage.setItem('__goods_prev_path__',this.props.location.pathname)
-                                }
+                {this.props.data.map(val => (
+                    <a
+                        key={val}
+                        style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
+                    >
+                        <img
+                            src={`https://zos.alipayobjects.com/rmsportal/${val}.png`}
+                            alt=""
+                            style={{touchAction:'none', width: '100%', verticalAlign: 'top' }}
+                            onLoad={(e) => {
+                                e.preventDefault()
+                                window.dispatchEvent(new Event('resize'));
                             }}
-                            style={{ display: 'inline-block', width: '100%', height: this.state.imgHeight }}
-                        >
-                            <img
-                                src={`${imgUrl}${item.img}`}
-                                alt=""
-                                style={{touchAction:'none', width: '100%', verticalAlign: 'top' }}
-                                onLoad={(e) => {
-                                    e.preventDefault()
-                                    window.dispatchEvent(new Event('resize'));
-                                }}
-                            />
-                        </a>
-                    )
-                })}
+                        />
+                    </a>
+                ))}
             </Carousel>
         )
     }
 }
 
-export default withRouter(Autoplay)
+export default Autoplay

@@ -7,9 +7,10 @@
     height:100%;
     flex: 1;
     display: flex;
+    background-color:#fff;
     .tabs-r{
+      background-color:#fff;
       width:100%;
-      height:100%;
       .tabs-r-box{
         width:100%;
         box-sizing:border-box;
@@ -65,12 +66,3 @@
     }
   }
 }
-.am-tabs-vertical .am-tabs-tab-bar-wrap{
-  height:auto;
-}
-// .am-tabs-default-bar-left .am-tabs-default-bar-tab{
-//   height:50px !important;
-// }
-// html:not([data-scale]) .am-tabs-default-bar-left .am-tabs-default-bar-tab::after{
-//   height:50px !important;
-// }

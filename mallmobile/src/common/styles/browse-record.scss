@@ -4,7 +4,6 @@
             padding:10px;
             background-color: #fff;
             margin-bottom:10px;
-            border-bottom: 1px solid #eee;
             .browse-time{
                 line-height: 34px;
                 height: 34px;
@@ -32,9 +31,8 @@
                             text-overflow: ellipsis;
                             display: -webkit-box;
                             -webkit-line-clamp: 2;
-                            /* autoprefixer: off */
+                            /*! autoprefixer: ignore next */
                             -webkit-box-orient: vertical;
-                            /* autoprefixer: on */
                         }
                         .price{
                             margin-top:10px;
@@ -52,11 +50,4 @@
             }
         }
     }
-}
-.order-tip{
-    display: flex;
-    align-items:center;
-    justify-content: center;
-    min-height: 60px;
-    color:#555;
 }
